@@ -1,0 +1,47 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Chuyển hướng tất cả các truy cập đến public/index.php
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Nếu là file, thư mục, hoặc liên kết thực tế thì bỏ qua
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Chuyển hướng các yêu cầu đến index.php
+    RewriteRule ^ index.php [L]
+</IfModule>
+# Chặn truy cập trực tiếp đến các tệp và thư mục quan trọng của Laravel
+<FilesMatch "\.(env|gitignore|gitattributes|log|htaccess|htpasswd|json|lock|config|yaml|twig|phpunit|xml|dist|bak|sh|sql|ini|sh|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Chặn truy cập vào các thư mục hệ thống
+RedirectMatch 404 ^/(bootstrap|config|database|resources|storage|tests)/.*$
+
+# Bảo vệ chống lỗ hổng directory listing
+Options -Indexes
+
+# Bảo vệ chống lỗ hổng clickjacking
+Header always append X-Frame-Options SAMEORIGIN
+
+# Bảo vệ chống lỗ hổng XSS
+Header set X-XSS-Protection "1; mode=block"
+
+# Bảo vệ chống MIME-type sniffing
+Header set X-Content-Type-Options nosniff
+
+# Bảo vệ chống lỗ hổng CSRF
+Header set X-CSRF-Protection "1; mode=block"
+
+# Chỉ định file trang lỗi tùy chỉnh cho lỗi 404 và 403
+ErrorDocument 404 /404.html
+ErrorDocument 403 /403.html
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php82” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

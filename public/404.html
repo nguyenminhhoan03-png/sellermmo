@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Không Tìm Thấy Trang</title>
+    <style>
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 50px 40px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            position: relative;
+        }
+        .error-code {
+            font-size: 110px;
+            font-weight: 900;
+            color: #1e88e5;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -2px;
+            text-shadow: 3px 3px 0 rgba(30,136,229,0.1);
+        }
+        h1 {
+            font-size: 26px;
+            margin-top: 15px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        p {
+            color: #6c757d;
+            font-size: 16px;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+        a.btn {
+            display: inline-block;
+            background: #1e88e5;
+            color: white;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 15px rgba(30,136,229,0.3);
+        }
+        a.btn:hover {
+            background: #1565c0;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(30,136,229,0.4);
+        }
+        .icon-search {
+            width: 85px;
+            height: 85px;
+            margin-bottom: 15px;
+            fill: #1e88e5;
+        }
+        .bg-shape {
+            position: absolute;
+            background: rgba(30,136,229,0.03);
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .shape-1 { width: 300px; height: 300px; top: -100px; left: -100px; }
+        .shape-2 { width: 400px; height: 400px; bottom: -150px; right: -150px; }
+        
+        .animated-search {
+            animation: floatUpDown 3s ease-in-out infinite;
+        }
+
+        @keyframes floatUpDown {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Floating abstract shapes behind -->
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+
+        <!-- Magnifying Glass SVG Icon -->
+        <svg class="icon-search animated-search" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            <!-- A little broken crack or question mark inside the glass -->
+            <path d="M9.5 7c-1.38 0-2.5 1.12-2.5 2.5h1c0-.83.67-1.5 1.5-1.5V7z" />
+        </svg>
+        
+        <h1 class="error-code">404</h1>
+        <h1>Không Tìm Thấy Trang</h1>
+        <p>Đường dẫn bạn vừa truy cập có thể đã bị thay đổi, xóa bỏ hoặc không hề tồn tại trên hệ thống.</p>
+        <a href="/" class="btn">Trở về Trang Chủ</a>
+    </div>
+
+</body>
+</html>
