@@ -504,7 +504,7 @@ function aiTotalPayment() {
   if(!selectedVariantId) return;
   $('#modal-total').html('<i class="fa fa-spinner fa-spin"></i>');
   $.ajax({ url:'/api/vouchers/aivoucher', method:'POST', dataType:'JSON',
-    data:{ access_token:'{{ $user->access_token ?? "" }}', variant_id:selectedVariantId, code:$('#ai-coupon').val() },
+    data:{ access_token:'{{ auth()->user()->access_token ?? "" }}', variant_id:selectedVariantId, code:$('#ai-coupon').val() },
     success:function(r){ $('#modal-total').html(r.message); }, error:function(){ $('#modal-total').html('Lỗi'); }
   });
 }

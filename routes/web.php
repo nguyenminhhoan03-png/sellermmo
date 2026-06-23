@@ -17,27 +17,29 @@ Route::redirect('/wp-login.php', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
 // login demo
 Route::post('/demo-login', function () {
-    $demoUser = User::firstOrCreate(
-        ['email' => 'guest@gmail.com'],
-        [
-            'password' => bcrypt('guest@gmail.com'),
-        ]
-    );
-    Auth::login($demoUser);
-    return response()->json([
-        'success' => true,
-        'message' => 'Đăng nhập thành công!',
-    ]);
+  $demoUser = User::firstOrCreate(
+    ['email' => 'guest@gmail.com'],
+    [
+      'password' => bcrypt('guest@gmail.com'),
+    ]
+  );
+  Auth::login($demoUser);
+  return response()->json([
+    'success' => true,
+    'message' => 'Đăng nhập thành công!',
+  ]);
 });
 
 
 // nojs
 Route::get('/nojs', function () {
-    return view('errors.nojs');
+  return view('errors.nojs');
 });
 // API CMT
 Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
 Route::get('/comments/{postId}', [App\Http\Controllers\CommentController::class, 'getComments']);
+
+
 // login đăng ký
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
@@ -47,35 +49,37 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/ai-account', [AiAccountController::class, 'index'])->name('ai-account.index');
 
+Route::middleware(['auth'])->group(function () {
+  Route::get('/ai-account/history', [AiAccountController::class, 'history'])->name('ai-account.history');
+  Route::post('/ai-account/payment', [AiAccountController::class, 'payment'])->name('ai-account.payment');
+  Route::post('/ai-account/transfer-payment', [AiAccountController::class, 'transferPayment'])->name('ai-account.transfer-payment');
+});
+
 // Hỗ trợ cả slug (SEO) lẫn id cũ (backward compat)
 Route::get('/ai-account/{slug}', [AiAccountController::class, 'detail'])->name('ai-account.detail');
-Route::middleware(['auth'])->group(function () {
-    Route::post('/ai-account/payment', [AiAccountController::class, 'payment'])->name('ai-account.payment');
-    Route::post('/ai-account/transfer-payment', [AiAccountController::class, 'transferPayment'])->name('ai-account.transfer-payment');
-});
 Route::get('/terms-condition', [HomeController::class, 'terms_condition'])->name('terms.condition');
 Route::get('/home', [HomeController::class, 'home'])->name('dvr');
 Route::get('/login/google', [AuthController::class, 'LoginGoogle'])->name('login.google');
 Route::get('/google/callback', [AuthController::class, 'LoginGoogleCallback'])->name('login.google.callback');
 // user
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/account')->group(function () {
-    Route::prefix('/profile')->group(function () {
-      Route::get('/', [App\Http\Controllers\Account\ProfileController::class, 'index'])->name('account.profile.index');
-      Route::post('/update', [App\Http\Controllers\Account\ProfileController::class, 'update'])->name('account.profile.update');
-      Route::post('/token-update', [App\Http\Controllers\Account\ProfileController::class, 'tokenUpdate'])->name('account.profile.token-update');
-      Route::post('/currency-update', [App\Http\Controllers\Account\ProfileController::class, 'currencyUpdate'])->name('account.profile.currency-update');
-      Route::post('/password-update', [App\Http\Controllers\Account\ProfileController::class, 'passwordUpdate'])->name('account.profile.password-update');
-    });
-    Route::get('/history', [App\Http\Controllers\Account\ProfileController::class, 'Showhistory'])->name('account.profile.history');
-    Route::get('/transactions', [App\Http\Controllers\Account\ProfileController::class, 'transactions'])->name('account.transactions');
-    Route::get('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorform'])->name('author-form');
-    Route::post('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorformPost']);
-    Route::get('/ctv', [App\Http\Controllers\Account\ProfileController::class, 'CtvView'])->name('account.ctv');
-    Route::get('/withdraw', [App\Http\Controllers\Account\ProfileController::class, 'withdrawView'])->name('account.withdraw');
-    Route::post('/withdraw', [App\Http\Controllers\Account\ProfileController::class, 'withdrawPost']);
-    Route::get('/product', [App\Http\Controllers\Account\ProductController::class, 'index'])->name('account.product');
-    Route::get('/product/upload', [App\Http\Controllers\Account\ProductController::class, 'upload'])->name('account.product.upload');
-    Route::post('/product/uploads', [App\Http\Controllers\Account\ProductController::class, 'uploadPost'])->name('account.upload.post');
+  Route::prefix('/profile')->group(function () {
+    Route::get('/', [App\Http\Controllers\Account\ProfileController::class, 'index'])->name('account.profile.index');
+    Route::post('/update', [App\Http\Controllers\Account\ProfileController::class, 'update'])->name('account.profile.update');
+    Route::post('/token-update', [App\Http\Controllers\Account\ProfileController::class, 'tokenUpdate'])->name('account.profile.token-update');
+    Route::post('/currency-update', [App\Http\Controllers\Account\ProfileController::class, 'currencyUpdate'])->name('account.profile.currency-update');
+    Route::post('/password-update', [App\Http\Controllers\Account\ProfileController::class, 'passwordUpdate'])->name('account.profile.password-update');
+  });
+  Route::get('/history', [App\Http\Controllers\Account\ProfileController::class, 'Showhistory'])->name('account.profile.history');
+  Route::get('/transactions', [App\Http\Controllers\Account\ProfileController::class, 'transactions'])->name('account.transactions');
+  Route::get('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorform'])->name('author-form');
+  Route::post('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorformPost']);
+  Route::get('/ctv', [App\Http\Controllers\Account\ProfileController::class, 'CtvView'])->name('account.ctv');
+  Route::get('/withdraw', [App\Http\Controllers\Account\ProfileController::class, 'withdrawView'])->name('account.withdraw');
+  Route::post('/withdraw', [App\Http\Controllers\Account\ProfileController::class, 'withdrawPost']);
+  Route::get('/product', [App\Http\Controllers\Account\ProductController::class, 'index'])->name('account.product');
+  Route::get('/product/upload', [App\Http\Controllers\Account\ProductController::class, 'upload'])->name('account.product.upload');
+  Route::post('/product/uploads', [App\Http\Controllers\Account\ProductController::class, 'uploadPost'])->name('account.upload.post');
 });
 // người bán hàng
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/resller')->group(function () {
@@ -163,47 +167,44 @@ Route::get('/blogs', [App\Http\Controllers\Blogs\BlogController::class, 'showBlo
 Route::get('/blogs/{slug}', [App\Http\Controllers\Blogs\BlogController::class, 'viewBlogs'])->name('blogs.view');
 // Hosting
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/hosting')->group(function () {
-    Route::get('/', [App\Http\Controllers\Hosting\HostingController::class, 'ShowGoiHost'])->name('hosting.index');
-    Route::post('/pay', [App\Http\Controllers\Hosting\HostingController::class, 'PayHost'])->name('hosting.post');
-    Route::post('/paycron', [App\Http\Controllers\Hosting\HostingController::class, 'PayHostCron'])->name('hosting.post.cron');
-    Route::get('/view-host/{id}', [App\Http\Controllers\Hosting\HostingController::class, 'ViewHost'])->name('hosting.view');
-    Route::get('/history', [App\Http\Controllers\Hosting\HostingController::class, 'ShowHistory'])->name('hosting.history');
-    Route::post('/giahan-update', [App\Http\Controllers\Hosting\HostingController::class, 'giahanauto'])->name('hosting.view.giahan');
-    // change domain
-    Route::post('/change-domain', [App\Http\Controllers\Hosting\HostingController::class, 'ChangeDomain'])->name('hosting.view.domain');
-    // login cpanel
-    Route::post('/login-hosting', [App\Http\Controllers\Hosting\HostingController::class, 'Login'])->name('hosting.view.login');
-    // login app
-    Route::post('/redirect-hosting', [App\Http\Controllers\Hosting\HostingController::class, 'redirect'])->name('hosting.view.redirect');
-    // cron gia hạn hosting auto
-    Route::get('/cron-auto', [App\Http\Controllers\Hosting\HostingController::class, 'handle'])->name('hosting.cron.auto');
-    // change pass cpanel 
-    Route::post('/change-pass', [App\Http\Controllers\Hosting\HostingController::class, 'changePass'])->name('hosting.view.changepass');
-    // change pack hosting
-    Route::post('/change-pack', [App\Http\Controllers\Hosting\HostingController::class, 'changePackage'])->name('hosting.view.changepackage');
-    // block ip 
-    Route::post('/block-ip', [App\Http\Controllers\Hosting\HostingController::class, 'BlockIp'])->name('hosting.view.blockip');
-    Route::post('/unl-block-ip', [App\Http\Controllers\Hosting\HostingController::class, 'UnlBlockIp'])->name('hosting.view.unlblockip');
-    // gia hạn
-    Route::post('/gia-han-host', [App\Http\Controllers\Hosting\HostingController::class, 'giahan'])->name('hosting.view.extend');
-    // cài đặt lại host
-    Route::post('/reinstall', [App\Http\Controllers\Hosting\HostingController::class, 'reinstall'])->name('hosting.view.reinstall');
-    // api voucher
-    Route::post('/vouchers', [App\Http\Controllers\Api\VoucherController::class, 'voucherhosting'])->name('hosting.view.voucherhosting');
-    
+  Route::get('/', [App\Http\Controllers\Hosting\HostingController::class, 'ShowGoiHost'])->name('hosting.index');
+  Route::post('/pay', [App\Http\Controllers\Hosting\HostingController::class, 'PayHost'])->name('hosting.post');
+  Route::post('/paycron', [App\Http\Controllers\Hosting\HostingController::class, 'PayHostCron'])->name('hosting.post.cron');
+  Route::get('/view-host/{id}', [App\Http\Controllers\Hosting\HostingController::class, 'ViewHost'])->name('hosting.view');
+  Route::get('/history', [App\Http\Controllers\Hosting\HostingController::class, 'ShowHistory'])->name('hosting.history');
+  Route::post('/giahan-update', [App\Http\Controllers\Hosting\HostingController::class, 'giahanauto'])->name('hosting.view.giahan');
+  // change domain
+  Route::post('/change-domain', [App\Http\Controllers\Hosting\HostingController::class, 'ChangeDomain'])->name('hosting.view.domain');
+  // login cpanel
+  Route::post('/login-hosting', [App\Http\Controllers\Hosting\HostingController::class, 'Login'])->name('hosting.view.login');
+  // login app
+  Route::post('/redirect-hosting', [App\Http\Controllers\Hosting\HostingController::class, 'redirect'])->name('hosting.view.redirect');
+  // cron gia hạn hosting auto
+  Route::get('/cron-auto', [App\Http\Controllers\Hosting\HostingController::class, 'handle'])->name('hosting.cron.auto');
+  // change pass cpanel 
+  Route::post('/change-pass', [App\Http\Controllers\Hosting\HostingController::class, 'changePass'])->name('hosting.view.changepass');
+  // change pack hosting
+  Route::post('/change-pack', [App\Http\Controllers\Hosting\HostingController::class, 'changePackage'])->name('hosting.view.changepackage');
+  // block ip 
+  Route::post('/block-ip', [App\Http\Controllers\Hosting\HostingController::class, 'BlockIp'])->name('hosting.view.blockip');
+  Route::post('/unl-block-ip', [App\Http\Controllers\Hosting\HostingController::class, 'UnlBlockIp'])->name('hosting.view.unlblockip');
+  // gia hạn
+  Route::post('/gia-han-host', [App\Http\Controllers\Hosting\HostingController::class, 'giahan'])->name('hosting.view.extend');
+  // cài đặt lại host
+  Route::post('/reinstall', [App\Http\Controllers\Hosting\HostingController::class, 'reinstall'])->name('hosting.view.reinstall');
+  // api voucher
+  Route::post('/vouchers', [App\Http\Controllers\Api\VoucherController::class, 'voucherhosting'])->name('hosting.view.voucherhosting');
 });
-Route::middleware(['auth', CheckLastLogin::class])->prefix('/logo')->group(function () {
-    
-});
+Route::middleware(['auth', CheckLastLogin::class])->prefix('/logo')->group(function () {});
 Route::get('/hostings/create', [App\Http\Controllers\Hosting\HostingController::class, 'CronJobs'])->name('hosting.cron');
 // thanh toán chuyển khoản
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/transfer')->group(function () {
   Route::get('/', [App\Http\Controllers\Transfer\TransferController::class, 'ShowPayment'])->name('transfer.view');
-Route::post('/payment', [App\Http\Controllers\Transfer\TransferController::class, 'transfer']);
-Route::get('/pay/{id}', [App\Http\Controllers\Transfer\TransferController::class, 'index'])->name('transfer.checkout');
-Route::get('/transfer-status', [App\Http\Controllers\Transfer\TransferController::class, 'get_status'])->name('transfer.status');
-Route::post('/transfer-status', [App\Http\Controllers\Transfer\TransferController::class, 'updateStatus']);
-Route::get('/delete/{id}', [App\Http\Controllers\Transfer\TransferController::class, 'destroy'])->name('transfer.delete');
+  Route::post('/payment', [App\Http\Controllers\Transfer\TransferController::class, 'transfer']);
+  Route::get('/pay/{id}', [App\Http\Controllers\Transfer\TransferController::class, 'index'])->name('transfer.checkout');
+  Route::get('/transfer-status', [App\Http\Controllers\Transfer\TransferController::class, 'get_status'])->name('transfer.status');
+  Route::post('/transfer-status', [App\Http\Controllers\Transfer\TransferController::class, 'updateStatus']);
+  Route::get('/delete/{id}', [App\Http\Controllers\Transfer\TransferController::class, 'destroy'])->name('transfer.delete');
 });
 // thuê cron
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/cronjob')->group(function () {
@@ -237,7 +238,6 @@ Route::middleware(['auth', Admin::class, CheckLastLogin::class])->prefix('/Cpane
     Route::get('/pay', [App\Http\Controllers\Admin\CodeController::class, 'pay'])->name('admin.manguon.pay');
     Route::post('/update-pay', [App\Http\Controllers\Admin\CodeController::class, 'updatePay'])->name('admin.manguon.update-pay');
     Route::post('/delete-pay', [App\Http\Controllers\Admin\CodeController::class, 'deletePay'])->name('admin.manguon.delete-pay');
-
   });
   // list domain
   Route::prefix('/domain')->group(function () {
@@ -350,7 +350,7 @@ Route::middleware(['auth', Admin::class, CheckLastLogin::class])->prefix('/Cpane
     Route::post('/update/{id}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.users.update');
     Route::get('/login-to/{username}', [App\Http\Controllers\Admin\UserController::class, 'loginTo'])->name('admin.users.login-to');
   });
-   // hóa đơn
+  // hóa đơn
   Route::prefix('/transfer')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\TransferController::class, 'index'])->name('admin.transfer.index');
     Route::post('/update', [App\Http\Controllers\Admin\TransferController::class, 'update'])->name('admin.transfer.update');
@@ -387,11 +387,12 @@ Route::middleware(['auth', Admin::class, CheckLastLogin::class])->prefix('/Cpane
     Route::post('/category', [App\Http\Controllers\Admin\BlogController::class, 'categoryPost'])->name('admin.blog.category.post');
     Route::post('/category/update', [App\Http\Controllers\Admin\BlogController::class, 'categoryUpdate'])->name('admin.blog.category.update');
     Route::post('/category/delete', [App\Http\Controllers\Admin\BlogController::class, 'categoryDelete'])->name('admin.blog.category.delete');
-  });  
+  });
   // chat support 
   Route::get('/chat', [App\Http\Controllers\Chat\ChatController::class, 'index'])->name('admin.chat.index');
   Route::post('/chat/mark-as-read', [App\Http\Controllers\Chat\ChatController::class, 'markAsRead'])->name('admin.chat.mark-as-read');
   Route::post('/chat/send', [App\Http\Controllers\Chat\ChatController::class, 'sendMessage'])->name('admin.chat.send');
+  Route::post('/chat/toggle-ai', [App\Http\Controllers\Chat\ChatController::class, 'toggleAiMode'])->name('admin.chat.toggle-ai');
 
   // setting 
   Route::prefix('/settings')->group(function () {

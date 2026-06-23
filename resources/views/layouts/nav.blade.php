@@ -176,6 +176,39 @@
                                 <!--end:Menu sub-->
                             </div>
                             <!--end:Menu item--><!--begin:Menu item-->
+                            <div data-kt-menu-trigger="click"
+                                class="menu-item menu-accordion @if (request()->routeIs('ai-account.*')) here show @endif">
+                                <!--begin:Menu link--><span class="menu-link"><span class="menu-icon"><i
+                                             class="ki-duotone ki-robot fs-2">
+                                             <span class="path1"></span>
+                                             <span class="path2"></span>
+                                             <span class="path3"></span>
+                                         </i>
+                                     </span>
+                                     <span class="menu-title">Tài Khoản AI</span>
+                                     <span class="menu-arrow"></span></span><!--end:Menu link--><!--begin:Menu sub-->
+                                <div class="menu-sub menu-sub-accordion">
+                                     <!--begin:Menu item-->
+                                     <div class="menu-item">
+                                         <!--begin:Menu link--><a
+                                             class="menu-link @if (request()->routeIs('ai-account.index')) active @endif @if (request()->routeIs('ai-account.detail')) active @endif"
+                                             href="/ai-account"><span class="menu-bullet"><span
+                                                     class="bullet bullet-dot"></span></span><span
+                                                 class="menu-title">Mua tài khoản AI</span></a><!--end:Menu link-->
+                                     </div>
+                                     <!--end:Menu item--><!--begin:Menu item-->
+                                     <div class="menu-item">
+                                         <!--begin:Menu link--><a
+                                             class="menu-link @if (request()->routeIs('ai-account.history')) active @endif"
+                                             href="/ai-account/history"><span class="menu-bullet"><span
+                                                     class="bullet bullet-dot"></span></span><span
+                                                 class="menu-title">Lịch sử mua</span></a><!--end:Menu link-->
+                                     </div>
+                                     <!--end:Menu item-->
+                                 </div>
+                                 <!--end:Menu sub-->
+                            </div>
+                            <!--end:Menu item--><!--begin:Menu item-->
                             <div data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
                                 data-kt-menu-placement="right-start"
                                 class="menu-item @if (request()->routeIs('domain.*')) here show @endif menu-lg-down-accordion menu-sub-lg-down-indention">
@@ -908,8 +941,40 @@
 
                                                 <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
+                                                    <a href="/ai-account/history" class="menu-link px-5">
+                                                        Tài khoản AI
+                                                    </a>
+                                                </div>
+                                                <!--end::Menu item-->
+
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
                                                     <a href="/domain/history" class="menu-link px-5">
                                                         Tên Miền
+                                                    </a>
+                                                </div>
+                                                <!--end::Menu item-->
+
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="/hosting/history" class="menu-link px-5">
+                                                        Hosting
+                                                    </a>
+                                                </div>
+                                                <!--end::Menu item-->
+
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="/web/history" class="menu-link px-5">
+                                                        Tạo Website
+                                                    </a>
+                                                </div>
+                                                <!--end::Menu item-->
+
+                                                <!--begin::Menu item-->
+                                                <div class="menu-item px-3">
+                                                    <a href="/logo/history" class="menu-link px-5">
+                                                        Tạo Logo
                                                     </a>
                                                 </div>
                                                 <!--end::Menu item-->

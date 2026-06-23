@@ -16,6 +16,12 @@
     <img src="/_assets/images/media/loader.svg" alt="">
   </div>
   <style>
+    .page {
+      display: block !important;
+    }
+    .app-sidebar {
+      position: fixed !important;
+    }
     /*page-overlay*/
     #page-overlay {
       opacity: 0;
@@ -348,7 +354,95 @@
     }
     </script>
   @include('admin.layouts.partials.vendor')
-  
+  <script>
+    (function() {
+      function getElementDebugInfo(selector) {
+        var el = document.querySelector(selector);
+        if (!el) return { selector: selector, status: 'not found' };
+        var rect = el.getBoundingClientRect();
+        var style = window.getComputedStyle(el);
+        return {
+          selector: selector,
+          status: 'found',
+          tagName: el.tagName,
+          id: el.id,
+          classList: Array.from(el.classList),
+          rect: {
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            bottom: rect.bottom,
+            right: rect.right
+          },
+          styles: {
+            display: style.display,
+            position: style.position,
+            top: style.top,
+            left: style.left,
+            height: style.height,
+            minHeight: style.minHeight,
+            marginTop: style.marginTop,
+            marginBlockStart: style.marginBlockStart,
+            paddingTop: style.paddingTop,
+            opacity: style.opacity,
+            zIndex: style.zIndex,
+            overflow: style.overflow,
+            flexDirection: style.flexDirection,
+            justifyContent: style.justifyContent
+          }
+        };
+      }
+
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var selectors = [
+            'body',
+            '.page',
+            '.app-header',
+            '.app-sidebar',
+            '.main-content',
+            '.container-fluid',
+            '#loader',
+            '#page-overlay',
+            '.page-header-breadcrumb'
+          ];
+          var debugData = {};
+          selectors.forEach(function(sel) {
+            debugData[sel] = getElementDebugInfo(sel);
+          });
+          
+          var pageEl = document.querySelector('.page');
+          if (pageEl) {
+            debugData['page_children'] = Array.from(pageEl.children).map(function(child) {
+              var rect = child.getBoundingClientRect();
+              return {
+                tagName: child.tagName,
+                id: child.id,
+                classList: Array.from(child.classList),
+                display: window.getComputedStyle(child).display,
+                position: window.getComputedStyle(child).position,
+                height: rect.height,
+                top: rect.top
+              };
+            });
+          }
+
+          fetch('/save-debug-layout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(debugData)
+          }).then(function(res) {
+            console.log('Layout debug data sent');
+          }).catch(function(err) {
+            console.error(err);
+          });
+        }, 1000);
+      });
+    })();
+  </script>
 </body>
 
 </html>

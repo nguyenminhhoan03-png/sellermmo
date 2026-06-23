@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
             'sepay/webhook',
+            'save-debug-layout',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -326,4 +326,19 @@ class AiAccountController extends Controller
 
         return view('fe.ai-detail', compact('account', 'variants', 'commentPostId', 'relatedAccounts', 'aiCategories'));
     }
+
+    public function history()
+    {
+        $user = auth()->user();
+        $orders = AiAccountOrder::with(['aiAccount', 'variant'])
+            ->where('user_id', $user->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('ai.history', [
+            'pageTitle' => 'Lịch sử mua tài khoản AI của ' . $user->name,
+            'orders' => $orders,
+            'user' => $user,
+        ]);
+    }
 }

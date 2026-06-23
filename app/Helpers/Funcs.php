@@ -323,13 +323,17 @@ if (!function_exists('formatCurrency')) {
     }
 
     $config = cur_setting();
+    if (!is_array($config)) {
+        $config = [];
+    }
 
     $decimal = 2;
-
     $prefix = '';
 
     if ($number_decimal == "") {
       $decimal = $config['currency_decimal'] ?? 2;
+    } else {
+      $decimal = (int) $number_decimal;
     }
 
     if ($decimalpoint == "") {

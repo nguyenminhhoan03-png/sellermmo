@@ -195,6 +195,49 @@ class DashboardController extends Controller
           'icon' => 'bi bi-basket-fill',
         ],
       ];
+
+      $stats['ai'] = [
+        'total_pay_ai'      => \App\Models\AiAccountOrder::count(),
+        'total_pay_full'     => \App\Models\AiAccountOrder::whereIn('status', ['paid', 'delivered'])->sum('price'),
+        'total_pay_payment'  => \App\Models\AiAccountOrder::whereIn('status', ['paid', 'delivered'])->whereDate('created_at', date('Y-m-d'))->sum('price'),
+        'total_ai_month'     => \App\Models\AiAccountOrder::whereIn('status', ['paid', 'delivered'])->whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'))->count(),
+        'total_ai_week'      => \App\Models\AiAccountOrder::whereIn('status', ['paid', 'delivered'])->whereBetween('created_at', [date('Y-m-d', strtotime('last monday')), date('Y-m-d', strtotime('next sunday'))])->count(),
+        'total_ai_today'     => \App\Models\AiAccountOrder::whereIn('status', ['paid', 'delivered'])->whereDate('created_at', date('Y-m-d'))->count(),
+      ];
+      $stats['t_ai'] = [
+        'total_pay_ai' => [
+          'label' => __('Tổng Đơn AI'),
+          'color' => 'danger',
+          'icon' => 'bi bi-basket-fill',
+        ],
+        'total_ai_week' => [
+          'label' => __('Đơn Hàng Tuần Này'),
+          'color' => 'primary',
+          'icon' => 'bi bi-calendar',
+        ],
+        'total_ai_today' => [
+          'label' => __('Đơn Hàng Hôm Nay'),
+          'color' => 'info',
+          'icon' => 'bi bi-calendar',
+        ],
+        'total_ai_month' => [
+          'label' => __('Đơn tháng :month', ['month' => date('m/Y')]),
+          'color' => 'info',
+          'icon' => 'bi bi-calendar',
+        ],
+        'total_pay_payment' => [
+          'label'  => __('Tổng tiền :day', ['day' => date('d/m/Y')]),
+          'color'  => 'success',
+          'format' => 'currency',
+          'icon' => 'bi bi-basket-fill',
+        ],
+        'total_pay_full' => [
+          'label'  => __('Tổng thanh toán'),
+          'color'  => 'success',
+          'format' => 'currency',
+          'icon' => 'bi bi-basket-fill',
+        ],
+      ];
     //
     $chartCategories = [];
     for ($i = 1; $i <= date('d'); $i++) {

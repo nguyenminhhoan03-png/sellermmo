@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace App\Http\Controllers\Chat;
 
 use App\Http\Controllers\Controller;
@@ -30,14 +32,14 @@ class ChatController extends Controller
         // Lấy room đang active
         $active_id = $request->get('room', $conversations->first()->id);
         $activeConversation = $conversations->where('id', $active_id)->first() ?? $conversations->first();
-        
+
         // Đánh dấu admin đã đọc tin nhắn
         if ($activeConversation->unread_admin > 0) {
             $unreadBefore = (int) $activeConversation->unread_admin;
             $activeConversation->update(['unread_admin' => 0]);
             $activeConversation->unread_admin = 0;
             $totalUnreadAdmin = max(0, $totalUnreadAdmin - $unreadBefore);
-            
+
             // Cập nhật tất cả tin nhắn của USER trong phòng này là đã xem
             ChatMessage::where('conversation_id', $activeConversation->id)
                 ->where('sender_type', 'user')
@@ -62,7 +64,7 @@ class ChatController extends Controller
         $message = ChatMessage::create([
             'conversation_id' => $conversationId,
             'sender_type' => 'admin',
-            'sender_id' => Auth::id() ?? 1, 
+            'sender_id' => Auth::id() ?? 1,
             'content' => $content,
             'type' => 'text',
         ]);
@@ -95,10 +97,10 @@ class ChatController extends Controller
 
         $content = $request->message;
         $userId = Auth::id();
-        
+
         // Tìm hội thoại: Ưu tiên tìm theo tài khoản đăng nhập trước
         $conversation = ChatConversation::where('user_id', $userId)->first();
-        
+
         if (!$conversation) {
             $conversation = ChatConversation::create([
                 'user_id' => $userId,
@@ -120,7 +122,7 @@ class ChatController extends Controller
         $message = ChatMessage::create([
             'conversation_id' => $conversationId,
             'sender_type' => 'user',
-            'sender_id' => $userId, 
+            'sender_id' => $userId,
             'content' => $content,
             'type' => 'text',
         ]);
@@ -145,11 +147,11 @@ class ChatController extends Controller
         if (!$conversation) {
             return response()->json(['messages' => []]);
         }
-        
+
         // Đánh dấu Khách đã đọc tin nhắn của Admin
         if ($conversation->unread_user > 0) {
             $conversation->update(['unread_user' => 0]);
-            
+
             ChatMessage::where('conversation_id', $conversation->id)
                 ->where('sender_type', 'admin')
                 ->where('is_read', 0)

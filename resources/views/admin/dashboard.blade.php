@@ -144,6 +144,31 @@
       </div>
       @endforeach
     </div>
+    <h5>{{ __('Thống Kê Tài Khoản AI') }}</h5>
+    <div class="row">
+      @foreach ($stats['ai'] as $key => $value)
+        <div class="col-12 col-md-4 col-lg-2 col-sm-6">
+          <div class="card custom-card">
+              <div class="card-body">
+                  <div class="d-flex flex-wrap align-items-top justify-content-between">
+                      <div class="flex-fill">
+                          <p class="mb-0 text-muted">{{ $stats['t_ai'][$key]['label'] ?? $key }}</p>
+                          <div class="d-flex align-items-center"> <span class="fs-5 fw-semibold">
+                            @if (isset($stats['t_ai'][$key]['format']) && $stats['t_ai'][$key]['format'] === 'currency')
+                            <h4 class="mb-0 fw-semibold">{{ formatCurrency($value) }}</h4>
+                          @else
+                            <h4 class="mb-0 fw-semibold">{{ number_format($value) }}</h4>
+                          @endif  
+                          </span></div>
+                      </div>
+                      <div> <span class="avatar avatar-md avatar-rounded bg-{{ $stats['t_ai'][$key]['color'] ?? 'primary' }}-transparent text-{{ $stats['t_ai'][$key]['color'] ?? 'primary' }} fs-18"> <i
+                                  class="{{ $stats['t_ai'][$key]['icon'] ?? 'bi bi-people-fill' }} fs-16"></i> </span> </div>
+                  </div>
+              </div>
+          </div>
+      </div>      
+      @endforeach
+    </div>
     <div class="col-12 col-md-12">
       <div class="card custom-card">
         <div class="card-header">

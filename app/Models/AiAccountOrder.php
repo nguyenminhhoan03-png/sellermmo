@@ -26,4 +26,14 @@ class AiAccountOrder extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function aiAccount()
+    {
+        return $this->belongsTo(AiAccount::class, 'ai_account_id');
+    }
+
+    public function variant()
+    {
+        return $this->belongsTo(AiAccountVariant::class, 'variant_id');
+    }
 }

@@ -321,14 +321,25 @@
             @endphp
             <!-- Header chat -->
             <div class="chat-main-header">
+                @php
+                    $isAiMode = !\Illuminate\Support\Facades\Cache::get("chat_conv_ai_disabled_{$activeConversation->id}", false);
+                @endphp
                 <div class="current-user">
                     <div class="user-avatar" style="background: #1e88e5">{{ mb_strtoupper($activeLetter) }}</div>
                     <div>
-                        <div class="user-name mb-0">{{ $activeName }}</div>
+                        <div class="user-name mb-0 d-flex align-items-center">
+                            {{ $activeName }}
+                            <span id="aiStatusBadge" class="badge {{ $isAiMode ? 'bg-info' : 'bg-warning' }} ms-2" style="font-size: 11px; font-weight: 500;">
+                                <i class="bi {{ $isAiMode ? 'bi-robot' : 'bi-person-fill' }}"></i> {{ $isAiMode ? 'AI Trả lời' : 'Admin Trực' }}
+                            </span>
+                        </div>
                         <small class="text-success" style="font-size: 12px;"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Cập nhật gần nhất: {{ $activeConversation->last_message_at ? $activeConversation->last_message_at->diffForHumans() : 'Mới tạo' }}</small>
                     </div>
                 </div>
-                <div class="chat-actions">
+                <div class="chat-actions d-flex align-items-center">
+                    <button id="toggleAiBtn" onclick="toggleAiMode({{ $activeConversation->id }})" title="{{ $isAiMode ? 'Tắt AI tự động' : 'Bật AI tự động' }}" class="btn btn-sm {{ $isAiMode ? 'btn-outline-warning' : 'btn-outline-info' }} me-2 py-1 px-2 d-flex align-items-center gap-1" style="font-size: 12px;">
+                        <i class="bi bi-robot"></i> <span id="toggleAiText">{{ $isAiMode ? 'Tắt AI' : 'Bật AI' }}</span>
+                    </button>
                     <button title="Lịch sử giao dịch"><i class="bi bi-receipt"></i></button>
                     <button title="Xóa hội thoại"><i class="bi bi-trash"></i></button>
                     <button title="Đánh dấu đã xong"><i class="bi bi-check2-all"></i></button>
@@ -478,7 +489,49 @@
     // Cuộn xuống dòng mới nhất
     function scrollToBottom() {
         let box = document.getElementById('adminChatBody');
-        box.scrollTop = box.scrollHeight;
+        if (box) {
+            box.scrollTop = box.scrollHeight;
+        }
+    }
+
+    function toggleAiMode(convId) {
+        $.ajax({
+            url: '{{ route("admin.chat.toggle-ai") }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                conversation_id: convId
+            },
+            success: function(res) {
+                if (res.status === 'success') {
+                    const badge = $('#aiStatusBadge');
+                    const btn = $('#toggleAiBtn');
+                    const btnText = $('#toggleAiText');
+                    
+                    if (res.is_ai_mode) {
+                        badge.removeClass('bg-warning').addClass('bg-info').html('<i class="bi bi-robot"></i> AI Trả lời');
+                        btn.removeClass('btn-outline-info').addClass('btn-outline-warning').attr('title', 'Tắt AI tự động');
+                        btnText.text('Tắt AI');
+                    } else {
+                        badge.removeClass('bg-info').addClass('bg-warning').html('<i class="bi bi-person-fill"></i> Admin Trực');
+                        btn.removeClass('btn-outline-warning').addClass('btn-outline-info').attr('title', 'Bật AI tự động');
+                        btnText.text('Bật AI');
+                    }
+                    
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            title: 'Thành công',
+                            text: res.message,
+                            icon: 'success',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                }
+            }
+        });
     }
 </script>
 @endsection
