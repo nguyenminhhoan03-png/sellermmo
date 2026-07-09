@@ -521,19 +521,30 @@
                                     class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-125px py-4"
                                     data-kt-menu="true"
                                 >
+                                    @php 
+                                        $prodCategory = Product::getCode($hiscodes->product_id, 'category');
+                                        $isAccType = in_array($prodCategory, ['account', 'mail', 'via_bm', 'clone']);
+                                    @endphp
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3">
-                                        <a
-                                            href="{{ Helper::muabanwebsite_dec(Product::getCode($hiscodes->product_id, 'link_down')) }}"
-                                            class="menu-link px-3"
-                                        >
-                                            Tải Xuống
-                                        </a>
+                                        @if($isAccType)
+                                            <a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal-accounts-{{ $hiscodes->id }}">
+                                                Xem Tài Khoản
+                                            </a>
+                                        @else
+                                            <a
+                                                href="{{ Helper::muabanwebsite_dec(Product::getCode($hiscodes->product_id, 'link_down')) }}"
+                                                class="menu-link px-3"
+                                            >
+                                                Tải Xuống
+                                            </a>
+                                        @endif
                                     </div>
+                                    @if(!$isAccType)
                                     <div class="menu-item px-3">
                                         <a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal-lickey-{{ $hiscodes->id }}">Key Code</a>
                                     </div>
-                                    <!--end::Menu item-->
+                                    @endif
 
                                     <!--begin::Menu item-->
                                     <div class="menu-item px-3">
@@ -575,6 +586,33 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        @if($isAccType)
+                        @php $deliveredAccounts = \App\Models\ProductAccount::where('trans_id', $hiscodes->trans_id)->get(); @endphp
+                        <div class="modal fade" tabindex="-1" id="modal-accounts-{{ $hiscodes->id }}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-warning">
+                                        <h3 class="modal-title text-dark fw-bold">Thông tin tài khoản đã mua</h3>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="alert alert-success">
+                                            Cảm ơn bạn đã mua hàng! Dưới đây là thông tin tài khoản của bạn:
+                                        </div>
+                                        <div class="form-group mb-4">
+                                            <textarea class="form-control" rows="8" readonly onclick="this.select(); document.execCommand('copy');" style="font-family: monospace; background-color: #f5f6fa; font-size: 14px; line-height: 1.6;">@foreach($deliveredAccounts as $acc){{ $acc->account_info }}
+@endforeach</textarea>
+                                            <small class="text-muted d-block mt-2">Nhấp chuột vào khung trên để tự động bôi đen và copy nhanh.</small>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         @endforeach
                         </tbody>
                 </table>

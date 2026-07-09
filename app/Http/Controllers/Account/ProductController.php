@@ -13,31 +13,14 @@ use Illuminate\Support\Facades\Http;
 
 class ProductController extends Controller
 {
-  public function index()
-  {
-    $user                = User::find(auth()->user()->id);
-    $id = $user->id;
-    $products = Product::where('status', 1)->where('user_id', $id)->orderBy('id', 'desc')->get();
-    if ($user->level != 2) {
-      return redirect()->route('home')->with('error', 'Bạn không phải là người bán hàng.');
+    public function index()
+    {
+        return redirect()->route('seller.products');
     }
-    return view('account.profile.product', [
-      'pageTitle' => ('Danh sách sản phẩm'),
-    ], compact('user', 'products'));
-  }
-  public function upload()
-  {
-    $user                = User::find(auth()->user()->id);
-    $id = $user->id;
-    if ($user->level != 2) {
-      return redirect()->route('home')->with('error', 'Bạn không phải là người bán hàng.');
+    public function upload()
+    {
+        return redirect()->route('seller.products.upload');
     }
-    $products = Product::where('status', 1)->where('user_id', $id)->orderBy('id', 'desc')->get();
-
-    return view('account.profile.upload', [
-      'pageTitle' => ('Danh sách sản phẩm'),
-    ], compact('user', 'products'));
-  }
   public function uploadPost(Request $request)
     {
       if (env('PRJ_DEMO_MODE', false) === true) {
@@ -56,7 +39,7 @@ class ProductController extends Controller
       if ($user->level != 2) {
         return response()->json([
           'status'  => 403,
-          'message' => 'Tài khoản của bạn không phải là cộng tác viên.',
+          'message' => 'Tài khoản của bạn không phải là cộng tác viên/người bán.',
         ], 403);
       }
       $messages = [
@@ -77,14 +60,14 @@ class ProductController extends Controller
       ];
       $payload = $request->validate([
         'images' => 'required|mimes:jpeg,jpg,png,gif',
-        'link_down' => 'string',
-        'link_demo' => 'string',
-        'list_images' => 'string',
-        'dicsounted_price' => 'numeric',
+        'link_down' => 'required|string',
+        'link_demo' => 'nullable|string',
+        'list_images' => 'nullable|string',
+        'dicsounted_price' => 'nullable|numeric',
         'product_name' => 'required|string|max:255',
         'price' => 'required|numeric|min:0',
         'description' => 'required|string',
-
+        'category' => 'required|string',
       ], $messages, $attributes);
 
       if (!$request->hasFile('images')) {
@@ -113,14 +96,15 @@ class ProductController extends Controller
         'user_id' => $user->id,
         'price' => $payload['price'],
         'images' => $url,
-        'list_images' => $payload['list_images'],
+        'list_images' => $payload['list_images'] ?? '',
         'intro' => $payload['description'],
         'view' => 0,
         'sold' => 0,
         'link_down' => Helper::muabanwebsite_enc($payload['link_down']),
-        'link_demo' => $payload['link_demo'],
+        'link_demo' => $payload['link_demo'] ?? '',
         'status' => 2,
-        'ck' => $payload['dicsounted_price'],
+        'ck' => $payload['dicsounted_price'] ?? 0,
+        'category' => $payload['category'],
       ]);
       Logs::create([
         'data'       => '0',

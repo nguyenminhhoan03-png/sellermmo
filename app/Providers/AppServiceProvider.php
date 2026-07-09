@@ -8,6 +8,8 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Model;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,13 +26,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('*', function ($view) {
+        Model::preventLazyLoading(! App::isProduction());
+
+        // 2. TỐI ƯU VIEW COMPOSER: Thay '*' bằng mảng các view layout cụ thể để tránh lỗi N+1 truy vấn
+        View::composer(['layouts.app', 'layouts.master', 'client.*'], function ($view) {
             $search = Product::query()->where('status', 1)->orderByDesc('id')->get();
             $bank = BankAccount::query()->where('status', 1)->get();
             $categoryPost = PostCategory::query()->where('status', 1)->get();
 
+            // Sửa lỗi chính tả 'seach' thành 'search', đồng thời truyền cả 'seach' để tương thích với view cũ
             $view->with([
-                'seach' => $search,
+                'search' => $search, 
+                'seach' => $search, 
                 'bank' => $bank,
                 'category_post' => $categoryPost,
             ]);

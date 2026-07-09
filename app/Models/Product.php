@@ -33,6 +33,12 @@ class Product extends Model
         'phanmem'   => ['label' => 'Phần mềm',   'icon' => '💻'],
         'ecommerce' => ['label' => 'E-commerce',  'icon' => '🛒'],
         'blog'      => ['label' => 'Blog/News',   'icon' => '📰'],
+        'account'   => ['label' => 'Tài khoản',   'icon' => '🔑'],
+        'mail'      => ['label' => 'Email (Gmail...)', 'icon' => '📧'],
+        'via_bm'    => ['label' => 'Via & BM FB', 'icon' => '📘'],
+        'clone'     => ['label' => 'Clone / MXH', 'icon' => '👥'],
+        'vps'       => ['label' => 'VPS / Hosting', 'icon' => '🖥️'],
+        'tool'      => ['label' => 'Tool / Bot', 'icon' => '🛠️'],
         'other'     => ['label' => 'Khác',        'icon' => '📦'],
     ];
 
@@ -45,5 +51,10 @@ class Product extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
     }
 }

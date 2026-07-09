@@ -14,12 +14,26 @@ return new class extends Migration
         if (!Schema::hasTable('users')) {
             Schema::create('users', function (Blueprint $table) {
                 $table->id();
-                $table->string('name');
-                $table->string('email')->unique();
-                $table->timestamp('email_verified_at')->nullable();
-                $table->string('password');
-                $table->rememberToken();
-                $table->timestamps();
+                $table->text('username')->nullable();
+                $table->text('chat_id')->nullable();
+                $table->text('name')->nullable();
+                $table->text('password')->nullable();
+                $table->text('email')->nullable();
+                $table->integer('level');
+                $table->text('access_token')->nullable();
+                $table->text('ip')->nullable();
+                $table->text('device')->nullable();
+                $table->text('otp')->nullable();
+                $table->integer('balance');
+                $table->integer('balance_ctv');
+                $table->integer('total_deposit');
+                $table->integer('banned');
+                $table->text('loai')->nullable();
+                $table->text('gioi_thieu')->nullable();
+                $table->text('skill')->nullable();
+                $table->integer('time_request')->default(0);
+                $table->text('created_at')->nullable();
+                $table->text('updated_at')->nullable();
             });
         }
 

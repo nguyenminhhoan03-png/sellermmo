@@ -23,13 +23,24 @@ class VoucherController extends Controller
             'code' => '',
             'id' => 'required|exists:tbl_list_code,id',
             'access_token' => 'required|exists:users,access_token',
+            'variant_id' => 'nullable',
         ]);
         $product = Product::findOrFail($payload['id']);
+        
+        $variantId = $request->input('variant_id');
+        $variant = null;
+        if (!empty($variantId)) {
+            $variant = \App\Models\ProductVariant::where('id', $variantId)
+                ->where('product_id', $product->id)
+                ->first();
+        }
+
+        $basePrice = $variant ? $variant->price : $product->price;
         
         if (empty($payload['code'])) {
             return response()->json([
                 'status'  => 200,
-                'message' => '' . number_format($product->price) . '₫',
+                'message' => '' . number_format($basePrice) . '₫',
             ], 200);
         }
 
@@ -38,7 +49,7 @@ class VoucherController extends Controller
         if (!$voucher) {
             return response()->json([
                 'status'  => 200,
-                'message' => '' . number_format($product->price) . '₫',
+                'message' => '' . number_format($basePrice) . '₫',
             ], 200);
         }
         $user = User::where('access_token', $payload['access_token'])->first();
@@ -59,7 +70,7 @@ class VoucherController extends Controller
             ], 400);
         }
 
-        $value = $product->price - ($product->price * $voucher->value / 100);
+        $value = $basePrice - ($basePrice * $voucher->value / 100);
 
         $exists = Voucher::where('code', $code)->where('qty', 0)->where('type', 'code')->first();
         if ($exists) {

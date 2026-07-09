@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'sepay/webhook',
             'save-debug-layout',
         ]);
+        $middleware->alias([
+            'seller' => \App\Http\Middleware\Seller::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

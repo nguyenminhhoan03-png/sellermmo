@@ -14,7 +14,7 @@
 
   <div class="card custom-card">
     <div class="card-header justify-content-between">
-      <div class="card-title">Danh sách Mã Nguồn</div>
+      <div class="card-title">Danh sách Sản Phẩm & Tài Khoản</div>
     </div>
     <div class="card-body">
       <div class="table-responsive theme-scrollbar" style="padding: 10px">
@@ -23,6 +23,7 @@
             <tr>
               <th>#</th>
               <th>{{ __('Tên Sản Phẩm') }}</th>
+              <th>{{ __('Danh Mục') }}</th>
               <th>{{ __('Giá Sản Phẩm') }}</th>
               <th>{{ __('Ảnh Sản Phẩm') }}</th>
               <th>{{ __('View') }}</th>
@@ -30,8 +31,8 @@
               <th>{{ __('Kích Hoạt') }}</th>
               <th>{{ __('Giảm Giá') }}</th>
               <th>{{ __('Người Bán') }}</th>
-              <th>{{ __('Ngày Đăng') }}</th>
               <th>{{ __('Trạng Thái') }}</th>
+              <th>{{ __('Ngày Đăng') }}</th>
               <th>{{ __('Thao Tác') }}</th>
             </tr>
           </thead>
@@ -90,13 +91,41 @@
         icon: 'success',
         title: 'Thành công',
         text: response.data.message
-      })
+      }).then(() => {
+        window.location.reload();
+      });
     }).catch((error) => {
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: $catchMessage(error)
       })
+    });
+  }
+  const approveProduct = (id) => {
+    Swal.fire({
+      title: 'Xác nhận duyệt',
+      text: 'Bạn có chắc chắn muốn duyệt hoạt động cho sản phẩm này?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Duyệt',
+      cancelButtonText: 'Hủy'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $showLoading();
+        axios.post(`/Cpanel/code/update-status`, {
+          id: id,
+          status: true
+        }).then((response) => {
+          Swal.fire('Thành công', 'Sản phẩm đã được duyệt hoạt động.', 'success').then(() => {
+            window.location.reload();
+          });
+        }).catch((error) => {
+          Swal.fire('Thất bại', $catchMessage(error), 'error');
+        });
+      }
     });
   }
     $(document).ready(function() {
@@ -154,6 +183,10 @@
               return $truncate(data, 60)
             }
           },
+          { data: 'category', render: (data) => {
+              const cats = { website: 'Website', game: 'Game', phanmem: 'Phần mềm', ecommerce: 'E-commerce', blog: 'Blog/News', account: 'Tài khoản', other: 'Khác' };
+              return `<span class="badge bg-info">${cats[data] || data || 'Khác'}</span>`;
+          }},
           { data: 'price', render: (data) => (data) },
           { data: 'images', render: (data) => `<img src="${data}" alt="image" style="max-width: 70px; border-radius: 10px;">` },
           { data: 'view'},
@@ -162,20 +195,28 @@
             data: 'status',
             render: (data, type, row) => {
               return `<div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault${row.id}" value="${row.id}" onchange="updateStatus(this)" ${data?'checked':''}>
+                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault${row.id}" value="${row.id}" onchange="updateStatus(this)" ${data === 1 ? 'checked' : ''}>
                   <label class="form-check label" for="flexSwitchCheckDefault${row.id}"></label>
                 </div>`
             }
           },
           { data: 'ck', render: (data) => (data)},
           { data: 'username', render: (data) => `<span class="badge bg-purple-gradient">${data}</span>`},
-          { data: 'status', render: (data) =>  (data == 1 ? '<span class="badge bg-success">Đang hoạt động</span>' : '<span class="badge bg-danger">Không hoạt động</span>')},
+          { data: 'status', render: (data) => {
+              if (data == 1) return '<span class="badge bg-success">Đang hoạt động</span>';
+              if (data == 2) return '<span class="badge bg-warning">Chờ Duyệt</span>';
+              return '<span class="badge bg-danger">Không hoạt động</span>';
+          }},
           { data: 'created_at', render: (data) => (data) },
           {
             data: null,
             render: (data) => {
-              return `<a href="/Cpanel/code/edit/${data.id}" class="badge bg-primary-gradient"><i class="fas fa-edit"></i></a>
-              <a href="javascript:deleteRow(${data.id})" class="shadow text-white badge bg-danger-gradient"><i class="fa fa-trash"></i></a>`
+              let approveBtn = '';
+              if (data.status == 2) {
+                approveBtn = `<a href="javascript:approveProduct(${data.id})" class="shadow text-white badge bg-success-gradient me-1" title="Duyệt nhanh sản phẩm"><i class="fas fa-check"></i> Duyệt</a>`;
+              }
+              return `${approveBtn}<a href="/Cpanel/code/edit/${data.id}" class="badge bg-primary-gradient"><i class="fas fa-edit"></i></a>
+              <a href="javascript:deleteRow(${data.id})" class="shadow text-white badge bg-danger-gradient ms-1"><i class="fa fa-trash"></i></a>`
             },
           },
         ],

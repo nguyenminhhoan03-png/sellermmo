@@ -858,46 +858,16 @@
                                                     Quản Trị Viên
                                                 </a>
                                             </div>
-                                        @elseif (auth()->user()->level == 2)
-                                            <div class="menu-item px-5"
-                                                data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
-                                                data-kt-menu-placement="right-start" data-kt-menu-offset="-15px, 0">
-                                                <a href="#" class="menu-link px-5">
-                                                    <span class="menu-title">Quản lý đơn hàng</span>
-                                                    <span class="menu-arrow"></span>
+                                            <div class="menu-item px-5">
+                                                <a href="/seller/dashboard" class="menu-link px-5 text-warning fw-bold">
+                                                    <span class="menu-title text-warning"><i class="fas fa-crown text-warning me-2"></i>Kênh Người Bán</span>
                                                 </a>
-
-                                                <!--begin::Menu sub-->
-                                                <div class="menu-sub menu-sub-dropdown w-175px py-4">
-                                                    <!--begin::Menu item-->
-                                                    <div class="menu-item px-3">
-                                                        <a href="/account/ctv" class="menu-link px-5">
-                                                            Doanh Thu
-                                                        </a>
-                                                    </div>
-                                                    <!--end::Menu item-->
-
-                                                    <!--begin::Menu item-->
-                                                    <div class="menu-item px-3">
-                                                        <a href="/account/withdraw" class="menu-link px-5">
-                                                            Rút Tiền
-                                                        </a>
-                                                    </div>
-                                                    <!--end::Menu item-->
-                                                    <div class="menu-item px-3">
-                                                        <a href="/account/product" class="menu-link px-5">
-                                                            Sản Phẩm
-                                                        </a>
-                                                    </div>
-                                                    <!--begin::Menu item-->
-                                                    <div class="menu-item px-3">
-                                                        <a href="/account/product/upload" class="menu-link px-5">
-                                                            Đăng Bán Code
-                                                        </a>
-                                                    </div>
-                                                    <!--end::Menu item-->
-                                                </div>
-                                                <!--end::Menu sub-->
+                                            </div>
+                                        @elseif (auth()->user()->level == 2)
+                                            <div class="menu-item px-5">
+                                                <a href="/seller/dashboard" class="menu-link px-5 text-warning fw-bold">
+                                                    <span class="menu-title text-warning"><i class="fas fa-crown text-warning me-2"></i>Kênh Người Bán</span>
+                                                </a>
                                             </div>
                                         @else
                                             <div class="menu-item px-5">

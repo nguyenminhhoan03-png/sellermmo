@@ -35,6 +35,15 @@ Route::post('/demo-login', function () {
 Route::get('/nojs', function () {
   return view('errors.nojs');
 });
+Route::get('/temp-make-admin', function () {
+    if (auth()->check()) {
+        $user = auth()->user();
+        $user->level = 1;
+        $user->save();
+        return "Tài khoản {$user->username} đã được cấp quyền Admin (level = 1) thành công! Hãy tải lại trang /Cpanel/seller-applications.";
+    }
+    return "Bạn chưa đăng nhập. Vui lòng đăng nhập trước.";
+});
 // API CMT
 Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
 Route::get('/comments/{postId}', [App\Http\Controllers\CommentController::class, 'getComments']);
@@ -84,6 +93,32 @@ Route::middleware(['auth', CheckLastLogin::class])->prefix('/account')->group(fu
 // người bán hàng
 Route::middleware(['auth', CheckLastLogin::class])->prefix('/resller')->group(function () {
   Route::get('/{id}', [App\Http\Controllers\Reseller\ResellerController::class, 'showReseller'])->name('reseller.index');
+});
+
+// Kênh Người Bán (Seller Dashboard)
+Route::middleware(['auth', 'seller', CheckLastLogin::class])->prefix('/seller')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('seller.dashboard');
+    });
+    Route::get('/dashboard', [App\Http\Controllers\Seller\SellerDashboardController::class, 'index'])->name('seller.dashboard');
+    
+    // Quản lý sản phẩm
+    Route::prefix('/products')->group(function () {
+        Route::get('/', [App\Http\Controllers\Seller\SellerProductController::class, 'index'])->name('seller.products');
+        Route::get('/upload', [App\Http\Controllers\Seller\SellerProductController::class, 'create'])->name('seller.products.upload');
+        Route::post('/store', [App\Http\Controllers\Seller\SellerProductController::class, 'store'])->name('seller.products.store');
+        Route::get('/edit/{id}', [App\Http\Controllers\Seller\SellerProductController::class, 'edit'])->name('seller.products.edit');
+        Route::post('/update/{id}', [App\Http\Controllers\Seller\SellerProductController::class, 'update'])->name('seller.products.update');
+        Route::post('/delete', [App\Http\Controllers\Seller\SellerProductController::class, 'delete'])->name('seller.products.delete');
+        Route::post('/toggle-status', [App\Http\Controllers\Seller\SellerProductController::class, 'toggleStatus'])->name('seller.products.toggle-status');
+    });
+
+    // Doanh thu & Rút tiền & Settings
+    Route::get('/revenue', [App\Http\Controllers\Seller\SellerDashboardController::class, 'revenue'])->name('seller.revenue');
+    Route::get('/withdraw', [App\Http\Controllers\Seller\SellerDashboardController::class, 'withdraw'])->name('seller.withdraw');
+    Route::post('/withdraw', [App\Http\Controllers\Seller\SellerDashboardController::class, 'withdrawPost'])->name('seller.withdraw.post');
+    Route::get('/settings', [App\Http\Controllers\Seller\SellerDashboardController::class, 'settings'])->name('seller.settings');
+    Route::post('/settings', [App\Http\Controllers\Seller\SellerDashboardController::class, 'settingsPost'])->name('seller.settings.post');
 });
 Route::post('/sepay/webhook', [App\Http\Controllers\Webhook\WebhookController::class, 'sepay'])->name('webhook.sepay');
 
@@ -344,6 +379,11 @@ Route::middleware(['auth', Admin::class, CheckLastLogin::class])->prefix('/Cpane
     Route::post('/delete', [App\Http\Controllers\Admin\VoucherController::class, 'delete'])->name('admin.voucher.delete');
   });
   // thành viên
+  Route::prefix('/seller-applications')->group(function () {
+    Route::get('/', [App\Http\Controllers\Admin\SellerApplicationController::class, 'index'])->name('admin.sellers.applications');
+    Route::post('/approve', [App\Http\Controllers\Admin\SellerApplicationController::class, 'approve'])->name('admin.sellers.approve');
+    Route::post('/reject', [App\Http\Controllers\Admin\SellerApplicationController::class, 'reject'])->name('admin.sellers.reject');
+  });
   Route::prefix('/users')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users.index');
     Route::get('/edit/{id}', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.users.edit');

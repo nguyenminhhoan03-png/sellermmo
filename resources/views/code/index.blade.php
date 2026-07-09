@@ -284,10 +284,36 @@
         </div>
         @else
         {{-- PAID product: normal modal --}}
+        @php $variants = $code->variants()->get(); @endphp
+        @if($variants->isNotEmpty())
+        <div class="mb-4 p-3 bg-light rounded border border-warning-subtle">
+          <label class="form-label fw-bold text-gray-800 fs-7 mb-2.5 d-block"><i class="fas fa-cubes text-warning me-1"></i>Chọn phân loại hàng:</label>
+          <div class="d-flex flex-column gap-2" id="variantsSelector">
+            @foreach($variants as $idx => $v)
+              @php $varStock = \App\Models\ProductAccount::where('variant_id', $v->id)->where('status', 0)->count(); @endphp
+              <div class="variant-select-card border p-3 rounded cursor-pointer d-flex align-items-center justify-content-between {{ $idx === 0 ? 'border-warning' : 'border-gray-300' }}" 
+                   data-id="{{ $v->id }}" 
+                   data-price="{{ $v->price }}"
+                   onclick="selectVariant(this, {{ $v->id }}, {{ $v->price }}, '{{ $v->name }}')"
+                   style="transition: all 0.25s ease; border-width: 2px !important; background: {{ $idx === 0 ? 'rgba(255,215,0,0.05)' : '#fff' }};">
+                <div>
+                  <strong class="text-gray-900 d-block fs-6">{{ $v->name }}</strong>
+                  <small class="text-muted">Còn lại: <span class="fw-bold text-success">{{ $varStock }}</span></small>
+                </div>
+                <div>
+                  <strong class="text-danger fs-5">{{ number_format($v->price) }}₫</strong>
+                </div>
+              </div>
+            @endforeach
+          </div>
+          <input type="hidden" name="selected_variant_id" id="selected_variant_id" value="{{ $variants->first()->id }}">
+        </div>
+        @endif
+
         <div class="price-buy-row">
           <div>
             <div class="price-label">{{ checkprice($code->price) }}</div>
-            <div class="price-val">{{ number_format($realPrice) }}₫</div>
+            <div class="price-val" id="displayPrice">{{ number_format($variants->isNotEmpty() ? $variants->first()->price : $realPrice) }}₫</div>
           </div>
           <button type="button" data-bs-toggle="modal" data-bs-target="#kt_modal_stacked_1" class="btn-buy-code">
             🛒 Mua ngay
@@ -320,6 +346,9 @@
       <div class="modal-body pt-3">
         <div style="background:#f9fafc;border-radius:14px;padding:14px 16px;margin-bottom:18px;">
           <div style="font-weight:700;color:#1e1e2d;margin-bottom:4px;">{{ $code->name }}</div>
+          @if($variants->isNotEmpty())
+            <div class="text-warning fw-bold fs-7 mt-1 mb-2" id="confirmVariantName">Phân loại: {{ $variants->first()->name }}</div>
+          @endif
           <div style="font-size:.8rem;color:#a1a5b7;">#{{ $code->id }} · {{ $code->created_at->format('d/m/Y') }}</div>
         </div>
 
@@ -421,12 +450,31 @@ document.addEventListener('DOMContentLoaded',function(){ loadComments(); });
 
 document.querySelectorAll('input[name="paymentMethod"]').forEach(r=>{ r.addEventListener('change',()=>{ document.querySelector('.bank-selection').classList.toggle('d-none', r.value!=='transfer'); }); });
 
+function selectVariant(element, id, price, name) {
+    document.querySelectorAll('.variant-select-card').forEach(card => {
+        card.style.borderColor = '#edf2f7';
+        card.style.background = '#fff';
+    });
+    element.style.borderColor = '#ffdd00';
+    element.style.background = 'rgba(255, 215, 0, 0.05)';
+    
+    document.getElementById('selected_variant_id').value = id;
+    document.getElementById('displayPrice').innerText = price.toLocaleString('vi-VN') + '₫';
+    
+    const confirmNameEl = document.getElementById('confirmVariantName');
+    if (confirmNameEl) {
+        confirmNameEl.innerText = 'Phân loại: ' + name;
+    }
+    
+    totalPayment();
+}
+
 function processPayment(){ const m=document.querySelector('input[name="paymentMethod"]:checked').value; if(m==='balance') buyProduct(); else if(m==='transfer') transferPayment(); }
 
 function buyProduct(){
   $('#btnBuy').html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...').prop('disabled',true);
   $.ajax({ url:"/view/payment", method:"POST", dataType:"JSON",
-    data:{ _token:'{{ csrf_token() }}', id:"{{ $code->id }}", code:$("#coupon").val() },
+    data:{ _token:'{{ csrf_token() }}', id:"{{ $code->id }}", code:$("#coupon").val(), variant_id: $('#selected_variant_id').val() || '' },
     success:function(r){ if(r.status=='200'){ Swal.fire({icon:'success',title:'Thành công!',text:r.message,showDenyButton:true,confirmButtonText:'Mua thêm',denyButtonText:'Xem đơn hàng'}).then(res=>{ if(res.isConfirmed) location.reload(); else if(res.isDenied) window.location.href='/code/history'; }); } else showMessage(r.message,'error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); },
     error:function(xhr){ showMessage(xhr.responseJSON?.message||'Lỗi','error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); }
   });
@@ -435,7 +483,7 @@ function buyProduct(){
 function transferPayment(){
   $('#btnBuy').html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...').prop('disabled',true);
   $.ajax({ url:"/transfer/payment", method:"POST", dataType:"JSON", headers:{'X-CSRF-TOKEN':'{{ csrf_token() }}'},
-    data:{ type:'code', id:"{{ $code->id }}", code:$("#coupon").val(), bank:document.getElementById('bank').value },
+    data:{ type:'code', id:"{{ $code->id }}", code:$("#coupon").val(), bank:document.getElementById('bank').value, variant_id: $('#selected_variant_id').val() || '' },
     success:function(r){ if(r.status=='200'){ showMessage(r.message,'success'); window.location.href=r.redirect_url; } else showMessage(r.message,'error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); },
     error:function(xhr){ showMessage(xhr.responseJSON?.message||'Lỗi','error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); }
   });
@@ -444,7 +492,7 @@ function transferPayment(){
 function totalPayment(){
   $('#total').html('<i class="fa fa-spinner fa-spin"></i>');
   $.ajax({ url:"/api/vouchers/redeem", method:"POST", dataType:"JSON",
-    data:{ access_token:"{{ $user->access_token }}", id:{{ $code->id }}, code:$("#coupon").val() },
+    data:{ access_token:"{{ $user->access_token ?? '' }}", id:{{ $code->id }}, code:$("#coupon").val(), variant_id: $('#selected_variant_id').val() || '' },
     success:function(r){ $('#total').html(r.message); },
     error:function(xhr){ showMessage(xhr.responseJSON?.message||'Không thể tính','error'); }
   });

@@ -86,8 +86,49 @@ use App\Events\GlobalPurchaseEvent;
             $ck = $voucher->value + $product->ck;
         }
 
-        $value = $product->price - ($product->price * $ck / 100);
+        $variantId = $request->input('variant_id');
+        $variant = null;
+        if (!empty($variantId)) {
+            $variant = \App\Models\ProductVariant::where('id', $variantId)
+                ->where('product_id', $product->id)
+                ->first();
+            if (!$variant) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Phân loại hàng không hợp lệ.'
+                ], 400);
+            }
+        }
+
+        $basePrice = $variant ? $variant->price : $product->price;
+        $value = $basePrice - ($basePrice * $ck / 100);
         
+        $isAccountProduct = in_array($product->category, ['account', 'mail', 'via_bm', 'clone']);
+        if ($isAccountProduct) {
+            $query = \App\Models\ProductAccount::where('product_id', $product->id)
+                ->where('status', 0);
+            
+            if ($variant) {
+                $query->where('variant_id', $variant->id);
+            } else {
+                if ($product->variants()->exists()) {
+                    return response()->json([
+                        'status'  => 400,
+                        'message' => 'Vui lòng chọn phân loại hàng trước khi thanh toán.',
+                    ], 400);
+                }
+                $query->whereNull('variant_id');
+            }
+
+            $unsoldAccount = $query->first();
+            if (!$unsoldAccount) {
+                return response()->json([
+                    'status'  => 400,
+                    'message' => 'Phân loại hàng này đã hết hàng trong kho. Vui lòng quay lại sau.',
+                ], 400);
+            }
+        }
+
         if ($user->banned !== 0) {
             return response()->json([
                 'status'  => 400,
@@ -97,7 +138,7 @@ use App\Events\GlobalPurchaseEvent;
         if ($user->balance < $value) {
             return response()->json([
               'status'  => 403,
-              'message' => 'Tài khoản của bạn không đủ để thực hiện mua code',
+              'message' => 'Tài khoản của bạn không đủ để thực hiện mua sản phẩm',
             ], 403);
           }
           if ($user->decrement('balance', $value) === false) {
@@ -132,6 +173,14 @@ use App\Events\GlobalPurchaseEvent;
             'trans_id' => $trans_id,
             'price' => $value,
           ]);
+
+          if ($isAccountProduct && isset($unsoldAccount)) {
+              $unsoldAccount->update([
+                  'status' => 1,
+                  'buyer_id' => $user->id,
+                  'trans_id' => $trans_id,
+              ]);
+          }
           $product->increment('sold');
            Transaction::create([
             'code'           => $trans_id,

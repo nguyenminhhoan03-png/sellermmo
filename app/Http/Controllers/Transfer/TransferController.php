@@ -81,6 +81,7 @@ class TransferController extends Controller
                 'id' => 'required|integer',
                 'type' => 'required',
                 'bank' => 'required',
+                'variant_id' => 'nullable',
             ],$messages, $attributes);
             $sanpham = Product::findOrFail($payload['id']);
         } elseif (($type) == 'domain') {
@@ -144,7 +145,45 @@ class TransferController extends Controller
                 $ck = $voucher->value + $sanpham->sale;
             }
         }
-        $value = $sanpham->price - ($sanpham->price * $ck / 100);
+
+        $variantId = $request->input('variant_id');
+        $variant = null;
+        if (!empty($variantId) && $type == 'code') {
+            $variant = \App\Models\ProductVariant::where('id', $variantId)
+                ->where('product_id', $sanpham->id)
+                ->first();
+            if (!$variant) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Phân loại hàng không hợp lệ.'
+                ], 400);
+            }
+        }
+
+        $basePrice = $variant ? $variant->price : $sanpham->price;
+        $value = $basePrice - ($basePrice * $ck / 100);
+
+        if ($type == 'code' && in_array($sanpham->category, ['account', 'mail', 'via_bm', 'clone'])) {
+            $stockQuery = \App\Models\ProductAccount::where('product_id', $sanpham->id)->where('status', 0);
+            if ($variant) {
+                $stockQuery->where('variant_id', $variant->id);
+            } else {
+                if ($sanpham->variants()->exists()) {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Vui lòng chọn phân loại hàng trước khi thanh toán.'
+                    ], 400);
+                }
+                $stockQuery->whereNull('variant_id');
+            }
+            if (!$stockQuery->exists()) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Phân loại hàng này đã hết hàng trong kho.'
+                ], 400);
+            }
+        }
+
         if ($value == 0) {
             return response()->json([
                 'status'  => 400,
@@ -170,11 +209,12 @@ class TransferController extends Controller
         $info             = Helper::getConfig('deposit_info');
         $trans_id = Helper::random('QWERTYUIOPASDFGHJKZXCVBNM', 2) . time();
         if (($type) == 'code') {
-        $content = [
-            'type' => $type,
-            'product_id' => $sanpham->id,
-            'ck' => $ck,
-        ];
+            $content = [
+                'type' => $type,
+                'product_id' => $sanpham->id,
+                'variant_id' => $variant ? $variant->id : null,
+                'ck' => $ck,
+            ];
         } elseif (($type) == 'domain') {
             $content = [
                 'type' => $type,

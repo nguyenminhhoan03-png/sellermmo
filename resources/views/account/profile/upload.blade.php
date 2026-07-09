@@ -15,7 +15,7 @@
                     </a>
                 </li>
                 <li class="breadcrumb-item text-gray-600">{{ auth()->user()->username ?? 'Chưa đăng nhập' }}</li>
-                <li class="breadcrumb-item text-gray-500">Mã Nguồn</li>
+                <li class="breadcrumb-item text-gray-500">Sản Phẩm / Tài Khoản</li>
             </ul>
         </div>
         <div class="d-flex align-items-center py-2">
@@ -93,11 +93,27 @@
 <div class="card card-flush py-4">
     <div class="card-header">
         <div class="card-title">
-            <h2>Link Tải Code</h2>
+            <h2>Danh Mục</h2>
         </div>
     </div>
     <div class="card-body pt-0">
-        <input type="text" name="link_down" class="form-control mb-2" placeholder="Nhập link tải code" value="" data-gtm-form-interact-field-id="4">
+        <select name="category" class="form-select mb-2">
+            @foreach (Product::CATEGORIES as $key => $category)
+                <option value="{{ $key }}">{{ $category['label'] }}</option>
+            @endforeach
+        </select>
+        <div class="text-muted fs-7">Chọn danh mục (VD: Tài khoản, Website...).</div>
+    </div>
+</div>
+<div class="card card-flush py-4">
+    <div class="card-header">
+        <div class="card-title">
+            <h2>Thông tin giao hàng</h2>
+        </div>
+    </div>
+    <div class="card-body pt-0">
+        <input type="text" name="link_down" class="form-control mb-2" placeholder="Nhập link tải hoặc tài khoản|mật khẩu" value="" data-gtm-form-interact-field-id="4">
+        <div class="text-muted fs-7">Nội dung này sẽ được ẩn đi và chỉ hiển thị cho người mua sau khi thanh toán thành công.</div>
     </div>
 </div>
 <div class="card card-flush py-4">

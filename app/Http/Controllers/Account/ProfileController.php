@@ -157,76 +157,83 @@ class ProfileController extends Controller
       } elseif ($user->level == 2) {
         return redirect()->route('home')->with('error', 'Tài khoản của bạn đã là người bán hàng rồi.');
       }
+
+      $application = AuthorForm::where('user_id', $user->id)->first();
+
       return view('account.profile.author-form', [
           'pageTitle' => 'Đăng ký trở thành người bán hàng',
           'user' => $user,
+          'application' => $application,
       ]);
   }
   public function authorformPost(Request $request)
     {
         $request->validate([
+            'shop_name' => 'required|string|max:255',
+            'contact_phone' => 'required|string|max:20',
+            'contact_facebook' => 'nullable|url|max:255',
+            'contact_telegram' => 'nullable|string|max:100',
+            'description' => 'required|string|max:1000',
+            'workCategory' => 'required|array|min:1',
             'team' => 'required|in:yes,no',
             'teamMembers' => 'required|string',
             'otherAccount' => 'required|in:yes,no',
             'marketAccount' => 'required|in:yes,no',
-            'workCategory' => 'nullable|array',
+        ], [
+            'shop_name.required' => 'Vui lòng nhập tên gian hàng.',
+            'contact_phone.required' => 'Vui lòng nhập số điện thoại liên hệ.',
+            'description.required' => 'Vui lòng nhập mô tả năng lực/kinh nghiệm.',
+            'workCategory.required' => 'Vui lòng chọn ít nhất một danh mục muốn bán.',
         ]);
+
         $user = auth()->user();
         $user_id = $user->id;
 
         $check = AuthorForm::where('user_id', $user_id)->first();
-        if ($check) {
+        if ($check && $check->status == '0') {
           return redirect()->back()->with('error', 'Đã có đơn đăng ký tồn tại trên hệ thống vui lòng chờ duyệt!');
         }
-        AuthorForm::create([
+
+        $data = [
             'user_id' => $user_id,
+            'shop_name' => $request->shop_name,
+            'contact_phone' => $request->contact_phone,
+            'contact_facebook' => $request->contact_facebook,
+            'contact_telegram' => $request->contact_telegram,
+            'description' => $request->description,
             'team' => $request->team,
             'team_members' => $request->teamMembers,
             'other_account' => $request->otherAccount,
             'market_account' => $request->marketAccount,
             'work_category' => $request->workCategory,
             'status' => '0',
-        ]);
-        $reg = redirect()->back()->with('success', 'Cảm ơn bạn đã gửi đơn chúng tôi sẽ phản hồi bạn lại sớm nhất!');
+        ];
 
-        Mail::to($user->email)->send(new AuthorFormMail($user));
+        if ($check) {
+            $check->update($data);
+        } else {
+            AuthorForm::create($data);
+        }
+
+        $reg = redirect()->back()->with('success', 'Cảm ơn bạn đã gửi đơn, chúng tôi sẽ phản hồi sớm nhất!');
+
+        try {
+            Mail::to($user->email)->send(new AuthorFormMail($user));
+        } catch (\Exception $e) {
+            // Ghi log nếu lỗi mail, không chặn luồng đăng ký
+            \Illuminate\Support\Facades\Log::error('Mail Error: ' . $e->getMessage());
+        }
 
         return $reg;
     }
     public function CtvView()
-  {
-      $user = auth()->user();
-      if ($user->level != 2) {
-        return redirect()->route('home')->with('error', 'Bạn không phải là người bán hàng.');
-      }
-      $hisctv = Transaction::where('user_id', $user->id)->where('sys_note', 'ctv')->get();
-      $totalDeposit = Transaction::where('user_id', $user->id)->where('type', 'new-order')->where('sys_note', 'ctv')->sum('amount');
-      $totalDepositInMonth = Transaction::where('user_id', $user->id)->where('type', 'new-order')->where('sys_note', 'ctv')->whereMonth('created_at', Carbon::now()->month)->whereYear('created_at', Carbon::now()->year)->sum('amount');
-      $totalDepositInToday = Transaction::where('user_id', $user->id)->where('type', 'new-order')->where('sys_note', 'ctv')->whereDate('created_at', Carbon::today())->sum('amount');
-      $totalDepositInWeek = Transaction::where('user_id', $user->id)->where('type', 'new-order')->where('sys_note', 'ctv')->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->sum('amount');
-      return view('account.profile.ctv', [
-          'pageTitle' => 'Quản lý doanh thu người bán hàng',
-          'user' => $user,
-          'hisctv' => $hisctv,
-          'totalDeposit' => $totalDeposit,
-          'totalDepositInMonth' => $totalDepositInMonth,
-          'totalDepositInToday' => $totalDepositInToday,
-          'totalDepositInWeek' => $totalDepositInWeek,
-      ]);
-  }
-  public function withdrawView()
-  {
-    $user = auth()->user();
-    if ($user->level != 2) {
-      return redirect()->route('home')->with('error', 'Bạn không phải là người bán hàng.');
+    {
+        return redirect()->route('seller.revenue');
     }
-    $whithdraw = WithdrawCtv::where('user_id', $user->id)->get();
-      return view('account.profile.withdraw', [
-          'pageTitle' => 'Rút tiền hoa hồng cho cộng tác viên',
-          'user' => $user,
-          'whithdraw' => $whithdraw
-      ]);
-  }
+    public function withdrawView()
+    {
+        return redirect()->route('seller.withdraw');
+    }
   public function withdrawPost(Request $request)
     {   
       $message     = [

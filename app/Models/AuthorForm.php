@@ -10,6 +10,11 @@ class AuthorForm extends Model
 
     protected $fillable = [
         'user_id',
+        'shop_name',
+        'contact_phone',
+        'contact_facebook',
+        'contact_telegram',
+        'description',
         'team',
         'team_members',
         'other_account',
@@ -21,4 +26,9 @@ class AuthorForm extends Model
     protected $casts = [
         'work_category' => 'array',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

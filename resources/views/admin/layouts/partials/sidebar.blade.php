@@ -59,19 +59,19 @@
                     </ul>
                 </li>
                 <!-- End::slide -->
-                <li class="slide__category"><span class="category-name">Mã Nguồn</span></li>
+                <li class="slide__category"><span class="category-name">Sản Phẩm / Tài Khoản</span></li>
                 <li class="slide">
                     <a href="{{ route('admin.manguon.index') }}"
                         class="side-menu__item {{ request()->routeIs('admin.manguon.index') ? 'active' : '' }} {{ request()->routeIs('admin.manguon.edit') ? 'active' : '' }}">
                         <i class="bx bx-code-alt side-menu__icon"></i>
-                        <span class="side-menu__label">{{ 'Danh sách mã nguồn' }}</span>
+                        <span class="side-menu__label">{{ 'Quản lý SP & Tài khoản' }}</span>
                     </a>
                 </li>
                 <li class="slide">
                     <a href="{{ route('admin.manguon.history') }}"
                         class="side-menu__item {{ request()->routeIs('admin.manguon.history') ? 'active' : '' }}">
                         <i class="bx bx-history side-menu__icon"></i>
-                        <span class="side-menu__label">{{ 'Lịch sử bán mã nguồn' }}</span>
+                        <span class="side-menu__label">{{ 'Lịch sử bán SP & TK' }}</span>
                     </a>
                 </li>
                 <li class="slide">
@@ -196,7 +196,20 @@
                 <li class="slide__category"><span class="category-name">Quản lý</span></li>
                 @php
                     $sidebarUnreadChat = \App\Models\ChatConversation::sum('unread_admin');
+                    $sidebarPendingSellers = \App\Models\AuthorForm::where('status', '0')->count();
                 @endphp
+                <li class="slide">
+                    <a href="{{ route('admin.sellers.applications') }}"
+                        class="side-menu__item {{ request()->routeIs('admin.sellers.*') ? 'active' : '' }}" style="position:relative;">
+                        <i class="bx bxs-user-detail side-menu__icon"></i>
+                        <span class="side-menu__label">Duyệt Đơn Người Bán</span>
+                        @if($sidebarPendingSellers > 0)
+                            <span style="position:absolute;top:7px;right:10px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ea5455;color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px #fff;">
+                                {{ $sidebarPendingSellers > 99 ? '99+' : $sidebarPendingSellers }}
+                            </span>
+                        @endif
+                    </a>
+                </li>
                 <li class="slide">
                     <a href="{{ route('admin.chat.index') }}"
                         class="side-menu__item {{ request()->routeIs('admin.chat.index') ? 'active' : '' }}" style="position:relative;">

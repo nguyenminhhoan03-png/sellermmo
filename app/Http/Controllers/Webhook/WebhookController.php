@@ -73,6 +73,8 @@ class WebhookController extends Controller
                 // 1A) Xử lý khi mua mã nguồn (Code)
                 if ($tranfer->content['type'] === 'code') {
                     $product = Product::find($tranfer->content['product_id']);
+                    $variantId = $tranfer->content['variant_id'] ?? null;
+                    
                     $license_key = md5($user->username . $product->id . time());
                     
                     Licenses::create([
@@ -90,6 +92,28 @@ class WebhookController extends Controller
                         'trans_id' => $trans_id,
                         'price' => $tranfer->price,
                     ]);
+
+                    // Account Delivery Logic for Webhook Transfer Orders
+                    $isAccType = in_array($product->category, ['account', 'mail', 'via_bm', 'clone']);
+                    if ($isAccType) {
+                        $accQuery = \App\Models\ProductAccount::where('product_id', $product->id)
+                            ->where('status', 0);
+                        if ($variantId) {
+                            $accQuery->where('variant_id', $variantId);
+                        } else {
+                            $accQuery->whereNull('variant_id');
+                        }
+                        
+                        $unsoldAccount = $accQuery->first();
+                        if ($unsoldAccount) {
+                            $unsoldAccount->update([
+                                'status' => 1,
+                                'buyer_id' => $user->id,
+                                'trans_id' => $trans_id,
+                            ]);
+                        }
+                    }
+
                     $product->increment('sold');
                     
                     Transaction::create([

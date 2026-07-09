@@ -155,7 +155,7 @@ class CodeController extends Controller
         'price' => 'required|numeric|min:0',
         'intro' => 'required|string',
         'status' => 'required',
-        'category' => 'nullable|string|in:website,game,phanmem,ecommerce,blog,other',
+        'category' => 'nullable|string|in:website,game,phanmem,ecommerce,blog,account,mail,via_bm,clone,vps,tool,other',
       ], $messages, $attributes);
 
       if (!$request->hasFile('images')) {
@@ -296,7 +296,7 @@ class CodeController extends Controller
         'price' => 'required|numeric|min:0',
         'intro' => 'required|string',
         'status' => 'required',
-        'category' => 'nullable|string|in:website,game,phanmem,ecommerce,blog,other',
+        'category' => 'nullable|string|in:website,game,phanmem,ecommerce,blog,account,mail,via_bm,clone,vps,tool,other',
       ], $messages, $attributes);
        
       $payload['link_down'] = Helper::muabanwebsite_enc($payload['link_down']);
