@@ -19,9 +19,10 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd /var/www/sellmmo/sellermmo
+            git reset --hard
             git pull origin main
-            docker compose up -d --build
-            docker compose exec -T app php artisan migrate --force
-            docker compose exec -T app php artisan config:cache
-            docker compose exec -T app php artisan route:cache
-            docker compose exec -T app php artisan view:cache
+            docker compose build
+            docker compose up -d
+            docker exec sellmmo-app php artisan migrate --force
+            docker exec sellmmo-app php artisan optimize:clear
+            docker restart sellmmo-nginx
