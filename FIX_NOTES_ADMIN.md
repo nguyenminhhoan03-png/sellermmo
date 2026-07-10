@@ -38,4 +38,4 @@ Khi bấm vào nút "Kích hoạt" (Toggle) hoặc nút "Duyệt", trang web hi�
 2.  Viết lại các Polyfill (Khai báo bù) cho toàn bộ các hàm tiện ích bị thiếu: `$catchMessage`, `$setLoading`, `$removeLoading`, `$showLoading`, `$truncate`.
 3.  Thêm đoạn script tự động lấy CSRF token từ `window.webData.csrfToken` gán vào Default Header của Axios (`axios.defaults.headers.common['X-CSRF-TOKEN']`).
 
-Nhờ vậy, toàn bộ các hàm JS liên quan đến Ajax/Axios ở tất cả các trang Admin đã được khôi phục hoạt động bình thường, gửi request POST chuẩn xác và thông báo lỗi đúng như thiết kế ban đầu.
+Nhờ vậy, toàn bộ các hàm JS liên quan đến Ajax/Axios ở tất cả các trang Admin đã được khôi phục hoạt động bình thường, gửi request POST chuẩn xác và thông báo lỗi đúng như thiết kế ban đầu
