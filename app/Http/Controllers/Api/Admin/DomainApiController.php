@@ -53,7 +53,7 @@ class DomainApiController extends Controller
                 'extend_price'     => formatCurrency($item->extend_price),
                 'sale'     => $item->sale. '%',
                 'status'    => $item->status,
-                'created_at'=> $item->created_at->format('Y-m-d H:i:s'),
+                'created_at'=> $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null,
             ];
         });
     

@@ -12,6 +12,7 @@ use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class SellerProductController extends Controller
 {
@@ -81,7 +82,15 @@ class SellerProductController extends Controller
             'list_images' => 'nullable|string',
             'link_demo' => 'nullable|string',
             'link_down' => 'required_unless:category,account,mail,via_bm,clone|nullable|string',
-            'accounts_list' => 'required_without:has_variants|nullable|string',
+            'accounts_list' => [
+                Rule::requiredIf(function () use ($request) {
+                    $cat = $request->input('category');
+                    $hasVariants = $request->input('has_variants', 0);
+                    return in_array($cat, ['account', 'mail', 'via_bm', 'clone']) && empty($hasVariants);
+                }),
+                'nullable',
+                'string',
+            ],
         ], [
             'product_name.required' => 'Tên sản phẩm là bắt buộc.',
             'price.required' => 'Giá sản phẩm là bắt buộc.',

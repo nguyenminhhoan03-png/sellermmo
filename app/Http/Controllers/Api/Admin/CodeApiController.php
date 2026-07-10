@@ -17,34 +17,35 @@ class CodeApiController extends Controller
             'sort_by'     => 'nullable|string|max:255',
             'sort_type'   => 'nullable|string|in:asc,desc',
         ]);
-    
+
         $page      = $payload['page'] ?? 1;
         $limit     = $payload['limit'] ?? 10;
         $search    = $payload['search'] ?? null;
         $offset    = ($page - 1) * $limit;
         $sort_by   = $payload['sort_by'] ?? 'id';
         $sort_type = $payload['sort_type'] ?? 'asc';
-    
+
         $query = \App\Models\Product::query();
-    
+
         if ($search) {
             $query->where('name', 'like', '%' . $search . '%');
         }
-    
+
         $total = $query->count();
-    
+
         $data = $query->select([
-                'id',
-                'name',
-                'user_id',
-                'price',
-                'view',
-                'ck',
-                'images',
-                'sold',
-                'status',
-                'created_at',
-            ])
+            'id',
+            'name',
+            'user_id',
+            'price',
+            'view',
+            'ck',
+            'images',
+            'sold',
+            'status',
+            'category',
+            'created_at',
+        ])
             ->skip($offset)
             ->take($limit)
             ->orderBy($sort_by, $sort_type)
@@ -56,17 +57,18 @@ class CodeApiController extends Controller
                 'name'      => $item->name,
                 'user_id'   => $item->user_id,
                 'price'     => formatCurrency($item->price),
-                'username' => $user->username ?? 'không xác định',
+                'username' => $user?->username ?? 'không xác định',
                 'intro'     => $item->intro,
+                'category'  => $item->category,
                 'view'      => $item->view,
                 'sold'      => $item->sold,
                 'images'    => $item->images,
-                'ck'      => $item->ck.'%',
+                'ck'      => $item->ck . '%',
                 'status'    => $item->status,
-                'created_at'=> $item->created_at->format('Y-m-d H:i:s'),
+                'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : null,
             ];
         });
-    
+
         return response()->json([
             'data'    => [
                 'meta' => [
@@ -80,5 +82,4 @@ class CodeApiController extends Controller
             'message' => 'Get data success',
         ]);
     }
-    
 }

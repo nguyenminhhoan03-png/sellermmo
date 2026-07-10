@@ -141,6 +141,7 @@
     });
   }
     $(document).ready(function() {
+      let currentDraw = 1;
       const $table = $('#datatable');
     
       const $tableOptions = {
@@ -151,9 +152,10 @@
           url: '/api/Cpanel/domain',
           type: 'GET',
           headers: {
-            Authorization: `Bearer ${access_token}`,
+            'Accept': 'application/json',
           },
           data: (data) => {
+            currentDraw = data.draw;
             let payload = {};
             payload.page = data.start / data.length + 1;
             payload.limit = data.length;
@@ -163,7 +165,7 @@
             return payload;
           },
           beforeSend: function(xhr) {
-            $setLoading($('#btn_reload'));
+            // $setLoading($('#btn_reload'));
           },
           error: function(xhr) {
             console.log(xhr?.responseJSON);
@@ -171,6 +173,7 @@
           dataFilter: function(data) {
             let json = JSON.parse(data);
             if (json.status) {
+              json.draw = currentDraw;
               json.recordsTotal = json.data.meta.total;
               json.recordsFiltered = json.data.meta.total;
               json.data = json.data.data;
@@ -192,7 +195,7 @@
             {
             data: 'name',
             render: (data) => {
-              return $truncate(data, 60)
+              return (data && data.length > 60) ? data.substring(0, 60) + '...' : (data || '');
             }
           },
           { data: 'price', render: (data) => (data) },
@@ -230,7 +233,7 @@
       const $tableInstance = $table.DataTable($tableOptions);
     
       $tableInstance.on('draw.dt', function() {
-        $removeLoading($('#btn_reload'));
+        // $removeLoading($('#btn_reload'));
         $('[data-bs-toggle="tooltip"]').tooltip();
       });
     });

@@ -759,10 +759,10 @@
                             @auth
                                 <div class="d-flex align-items-center ms-1 ms-lg-3">
                                     <!--begin::Menu wrapper-->
-                                    <div class="btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px position-relative btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px"
+                                    <div class="btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px position-relative"
                                         data-kt-menu-trigger="click" data-kt-menu-attach="parent"
                                         data-kt-menu-placement="bottom-end">
-                                        <div class="symbol symbol-35px symbol-circle me-3">
+                                        <div class="symbol symbol-35px symbol-circle">
                                             <img src="{{ asset('assets/media/avatars/user-placeholder.svg') }}" alt="" />
                                         </div>
                                     </div>
@@ -1001,10 +1001,10 @@
                             @else
                                 <div class="d-flex align-items-center ms-1 ms-lg-3">
                                     <!--begin::Menu wrapper-->
-                                    <div class="btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px position-relative btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px"
+                                    <div class="btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px position-relative"
                                         data-kt-menu-trigger="click" data-kt-menu-attach="parent"
                                         data-kt-menu-placement="bottom-end">
-                                        <div class="symbol symbol-35px symbol-circle me-3">
+                                        <div class="symbol symbol-35px symbol-circle">
                                             <img src="{{ asset('assets/media/avatars/user-placeholder.svg') }}" alt="" />
                                         </div>
                                     </div>
@@ -1015,14 +1015,16 @@
 
 
                                         <!--begin::Menu item-->
-                                        <div class="menu-item px-5">
+                                        <div class="menu-item px-5 my-1">
                                             <a href="/login" class="menu-link px-5">
-                                                Đăng Nhập
+                                                <span class="menu-icon"><i class="fas fa-user fs-4 text-primary me-3"></i></span>
+                                                <span class="menu-title fw-bold text-gray-800">Đăng Nhập</span>
                                             </a>
                                         </div>
-                                        <div class="menu-item px-5">
+                                        <div class="menu-item px-5 my-1">
                                             <a href="/register" class="menu-link px-5">
-                                                Đăng Ký
+                                                <span class="menu-icon"><i class="fas fa-user-plus fs-4 text-success me-3"></i></span>
+                                                <span class="menu-title fw-bold text-gray-800">Đăng Ký</span>
                                             </a>
                                         </div>
                                     </div>

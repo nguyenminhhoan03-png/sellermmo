@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\Domain;
 use Illuminate\Support\Facades\DB;
+use App\Models\Web;
+use App\Models\HostingPackages;
 
 class HomeController extends Controller
 {
@@ -48,7 +50,10 @@ class HomeController extends Controller
             ->pluck('cnt', 'category_id')
             ->toArray();
 
-        return view('fe.dash', compact('products', 'domains', 'seach', 'ai', 'aiCategories', 'aiCategoryCounts'));
+        $webs = Web::where('status', 1)->orderBy('id', 'desc')->take(8)->get();
+        $hostings = HostingPackages::orderBy('id', 'desc')->take(8)->get();
+
+        return view('fe.dash', compact('products', 'domains', 'seach', 'ai', 'aiCategories', 'aiCategoryCounts', 'webs', 'hostings'));
     }
     public function home()
     {
@@ -82,7 +87,10 @@ class HomeController extends Controller
             ->pluck('cnt', 'category_id')
             ->toArray();
 
-        return view('fe.dash', compact('products', 'domains', 'seach', 'ai', 'aiCategories', 'aiCategoryCounts'));
+        $webs = Web::where('status', 1)->orderBy('id', 'desc')->take(8)->get();
+        $hostings = HostingPackages::orderBy('id', 'desc')->take(8)->get();
+
+        return view('fe.dash', compact('products', 'domains', 'seach', 'ai', 'aiCategories', 'aiCategoryCounts', 'webs', 'hostings'));
     }
     public function terms_condition()
     {

@@ -60,16 +60,55 @@
   <!-- CoreJS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf/notyf.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/notyf/notyf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
+  @php
+    /** @var \App\Models\User|null $user */
+    $user = auth()->user();
+  @endphp
   <script>
     window.webData = @json([
-        'csrfToken' => csrf_token(),
+      'csrfToken' => csrf_token(),
     ]);
-    window.userData = @json(auth()->user());
-    window.access_token = @json(auth()->user()->access_token);
-  </script>
+    window.userData = @json($user);
+    window.access_token = @json($user?->access_token ?? '');
 
-  @vite(['resources/css/app.css', 'resources/js/app.js'])
+    // Polyfill for missing custom functions
+    window.$catchMessage = function(error) {
+      if (error && error.response && error.response.data && error.response.data.message) {
+        return error.response.data.message;
+      }
+      return error?.message || "Đã có lỗi xảy ra, vui lòng thử lại.";
+    };
+    window.$setLoading = function(element) {
+      if (element) { $(element).prop('disabled', true).addClass('loading'); }
+    };
+    window.$removeLoading = function(element) {
+      if (element) { $(element).prop('disabled', false).removeClass('loading'); }
+    };
+    window.$showLoading = function() {
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: 'Đang xử lý',
+          html: 'Vui lòng chờ...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+      }
+    };
+    window.$truncate = function(data, length) {
+      return (data && data.length > length) ? data.substring(0, length) + '...' : (data || '');
+    };
+
+    // Setup Axios CSRF Token automatically when Axios loads
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof axios !== 'undefined') {
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = window.webData.csrfToken;
+      }
+    });
+  </script>
 
   <style>
     * {

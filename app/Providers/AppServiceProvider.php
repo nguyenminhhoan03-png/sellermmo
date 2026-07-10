@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! App::isProduction());
 
         // 2. TỐI ƯU VIEW COMPOSER: Thay '*' bằng mảng các view layout cụ thể để tránh lỗi N+1 truy vấn
-        View::composer(['layouts.app', 'layouts.master', 'client.*'], function ($view) {
+        View::composer(['layouts.app', 'layouts.master', 'client.*', 'code.*', 'web.*', 'fe.*', 'hosting.*', 'domain.*'], function ($view) {
             $search = Product::query()->where('status', 1)->orderByDesc('id')->get();
             $bank = BankAccount::query()->where('status', 1)->get();
             $categoryPost = PostCategory::query()->where('status', 1)->get();

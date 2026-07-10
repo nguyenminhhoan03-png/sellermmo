@@ -125,6 +125,18 @@
     <span class="site-loader"> </span>
     <span class="loader-content"> Loading... </span>
 </div>
+<style>
+/* ----------------- FIX FOOTER TEXT COLORS ----------------- */
+#kt_footer.bg-dark { background-color: #1a1a27 !important; border-top: none !important; }
+[data-bs-theme="dark"] #kt_footer.bg-dark { background-color: #151521 !important; border-top: 1px solid #2d2d44; }
+#kt_footer h3, #kt_footer h6 { color: #ffffff !important; }
+#kt_footer p, #kt_footer span { color: #a1a5b7 !important; }
+#kt_footer a.text-light { color: #a1a5b7 !important; transition: color 0.2s; }
+#kt_footer a.text-light:hover { color: #e94560 !important; }
+#kt_footer .footer-bottom a { color: #e9edf0 !important; }
+#kt_footer .footer-bottom a:hover { color: #e94560 !important; }
+#kt_footer i.text-white { color: #a1a5b7 !important; }
+</style>
 <footer class="footer bg-dark text-light pt-10 pb-5" id="kt_footer">
     <div class="container">
         <div class="row">

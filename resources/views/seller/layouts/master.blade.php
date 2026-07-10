@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi" data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Kênh Người Bán</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- CSS Bootstrap & SweetAlert -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -84,7 +85,7 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
             transition: all 0.2s ease;
         }
 
@@ -259,28 +260,34 @@
             .seller-sidebar {
                 transform: translateX(-100%);
             }
+
             .seller-sidebar.show {
                 transform: translateX(0);
                 box-shadow: 10px 0 30px rgba(15, 23, 42, 0.15);
             }
+
             .seller-header {
                 left: 0;
                 padding: 0 20px;
             }
+
             .seller-main {
                 margin-left: 0;
                 padding-left: 15px;
                 padding-right: 15px;
             }
+
             .toggle-sidebar-btn {
                 display: block;
             }
+
             .sidebar-overlay.show {
                 display: block;
             }
         }
     </style>
 </head>
+
 <body>
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -298,14 +305,14 @@
             <a href="/" class="home-circle-btn" title="Về trang chủ">
                 <i class="fas fa-home"></i>
             </a>
-            
+
             <div class="d-none d-sm-flex align-items-center gap-2">
                 <div class="text-end">
                     <span class="user-meta-name">{{ auth()->user()->username }}</span>
                     <span class="user-meta-role">Đối tác CTV</span>
                 </div>
             </div>
-            
+
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-decoration-none" data-bs-toggle="dropdown">
                     <img src="/assets/media/avatars/user-placeholder.svg" alt="Avatar" width="38" height="38" class="rounded-circle border border-2 border-warning" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed={{ auth()->user()->username }}'">
@@ -313,7 +320,9 @@
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm">
                     <li><a class="dropdown-item" href="{{ route('account.profile.index') }}"><i class="fas fa-user-circle me-2"></i>Tài khoản</a></li>
                     <li><a class="dropdown-item" href="{{ route('author-form') }}"><i class="fas fa-id-card me-2"></i>Xác thực CCCD</a></li>
-                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
                     <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                 </ul>
             </div>
@@ -328,7 +337,7 @@
                 <span>SELLER CONSOLE</span>
             </div>
         </div>
-        
+
         <h5 class="sidebar-title">Menu quản lý</h5>
         <ul class="sidebar-menu">
             <li>
@@ -378,13 +387,13 @@
                         <span>Xác thực CCCD</span>
                     </div>
                     @php
-                        $userForm = \App\Models\AuthorForm::where('user_id', auth()->id())->first();
-                        $statusForm = $userForm ? $userForm->status : 0;
+                    $userForm = \App\Models\AuthorForm::where('user_id', auth()->id())->first();
+                    $statusForm = $userForm ? $userForm->status : 0;
                     @endphp
                     @if($statusForm == 1)
-                        <span class="badge bg-success" title="Đã xác minh"><i class="fas fa-check"></i></span>
+                    <span class="badge bg-success" title="Đã xác minh"><i class="fas fa-check"></i></span>
                     @else
-                        <span class="badge bg-secondary" title="Chưa xác minh"><i class="fas fa-exclamation"></i></span>
+                    <span class="badge bg-secondary" title="Chưa xác minh"><i class="fas fa-exclamation"></i></span>
                     @endif
                 </a>
             </li>
@@ -423,4 +432,5 @@
     </script>
     @yield('scripts')
 </body>
+
 </html>

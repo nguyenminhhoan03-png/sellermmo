@@ -8,11 +8,28 @@
 /* ===== HERO ===== */
 .home-hero {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 70%, #e94560 100%);
+  background-size: 300% 300%;
+  animation: heroGradient 10s ease infinite;
   border-radius: 20px;
   padding: 52px 40px;
   margin-bottom: 32px;
   position: relative;
   overflow: hidden;
+}
+@keyframes heroGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes float1 {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(15px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes float2 {
+  0% { transform: translateY(0) translateX(0) scale(1); }
+  50% { transform: translateY(-15px) translateX(15px) scale(1.1); }
+  100% { transform: translateY(0) translateX(0) scale(1); }
 }
 .home-hero::before {
   content: '';
@@ -22,6 +39,7 @@
   border-radius: 50%;
   background: rgba(233,69,96,.18);
   pointer-events: none;
+  animation: float1 6s ease-in-out infinite;
 }
 .home-hero::after {
   content: '';
@@ -31,6 +49,7 @@
   border-radius: 50%;
   background: rgba(255,255,255,.05);
   pointer-events: none;
+  animation: float2 7s ease-in-out infinite;
 }
 .home-hero .hero-badge {
   display: inline-block;
@@ -209,7 +228,8 @@
 [data-bs-theme="dark"] .cat-card .cat-name,
 [data-bs-theme="dark"] .product-name,
 [data-bs-theme="dark"] .ai-name,
-[data-bs-theme="dark"] .trust-card h5 { color: #e9edf0; }
+[data-bs-theme="dark"] .trust-card h5,
+[data-bs-theme="dark"] .section-title-main { color: #e9edf0; }
 [data-bs-theme="dark"] .domain-item-pill { background: #15152a; border-color: #2d2d44; }
 [data-bs-theme="dark"] .domain-ext { color: #e9edf0; }
 [data-bs-theme="dark"] .filter-tab { background: #1c1c2e; border-color: #2d2d44; color: #a1a5b7; }
@@ -219,45 +239,108 @@
   <div class="content flex-row-fluid" id="kt_content">
 
     {{-- ═══════════════════════════════════ HERO ═══════════════════════════════════ --}}
-    <div class="home-hero">
-      <div class="row align-items-center g-4">
-        <div class="col-lg-7">
-          <span class="hero-badge">🔥 #1 Marketplace Việt Nam</span>
-          <h1>Mua &amp; Bán Dịch Vụ Số<br>Uy Tín – Giá Tốt Nhất</h1>
-          <p>Mã nguồn, tài khoản AI, tên miền, hosting &amp; thiết kế logo – tất cả trong một nơi duy nhất.</p>
-          <div class="d-flex hero-cta">
-            <a href="/" class="btn-hero-primary">
-              <i class="fas fa-th-large me-2"></i>Khám phá ngay
-            </a>
-            <a href="{{ route('web.index') }}" class="btn-hero-outline">
-              <i class="fas fa-globe me-2"></i>Tạo Website
-            </a>
+    <div id="heroCarousel" class="carousel slide mb-8" data-bs-ride="carousel" data-bs-interval="4000" data-bs-wrap="true">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+      </div>
+      <div class="carousel-inner" style="border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.08);">
+        <div class="carousel-item active">
+          <div class="home-hero mb-0">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <span class="hero-badge">🔥 #1 Marketplace Việt Nam</span>
+                <h1>Mua &amp; Bán Dịch Vụ Số<br>Uy Tín – Giá Tốt Nhất</h1>
+                <p>Mã nguồn, tài khoản AI, tên miền, hosting &amp; thiết kế logo – tất cả trong một nơi duy nhất.</p>
+                <div class="d-flex hero-cta">
+                  <a href="/" class="btn-hero-primary">
+                    <i class="fas fa-th-large me-2"></i>Khám phá ngay
+                  </a>
+                  <a href="{{ route('web.index') }}" class="btn-hero-outline">
+                    <i class="fas fa-globe me-2"></i>Tạo Website
+                  </a>
+                </div>
+              </div>
+              <div class="col-lg-5">
+                <div class="d-flex align-items-center justify-content-lg-end justify-content-start gap-4 flex-wrap">
+                  <div class="hero-stat">
+                    <div class="num">500+</div>
+                    <div class="label">Sản phẩm</div>
+                  </div>
+                  <div class="hero-divider d-none d-sm-block"></div>
+                  <div class="hero-stat">
+                    <div class="num">1.200+</div>
+                    <div class="label">Khách hàng</div>
+                  </div>
+                  <div class="hero-divider d-none d-sm-block"></div>
+                  <div class="hero-stat">
+                    <div class="num">24/7</div>
+                    <div class="label">Hỗ trợ</div>
+                  </div>
+                  <div class="hero-divider d-none d-sm-block"></div>
+                  <div class="hero-stat">
+                    <div class="num">100%</div>
+                    <div class="label">Uy tín</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="col-lg-5">
-          <div class="d-flex align-items-center justify-content-lg-end justify-content-start gap-4 flex-wrap">
-            <div class="hero-stat">
-              <div class="num">500+</div>
-              <div class="label">Sản phẩm</div>
+        <div class="carousel-item">
+          <div class="home-hero mb-0" style="background: linear-gradient(135deg, #2b1055 0%, #7597de 100%);">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <span class="hero-badge" style="background: rgba(255,255,255,.2); color: #fff; border-color: rgba(255,255,255,.4);">🚀 Tăng Tốc Kinh Doanh</span>
+                <h1>Hosting &amp; Tên Miền<br>Tốc Độ Cao - Ổn Định</h1>
+                <p>Khởi tạo website nhanh chóng với hệ thống Hosting SSD siêu tốc và đăng ký tên miền giá rẻ.</p>
+                <div class="d-flex hero-cta">
+                  <a href="{{ route('hosting.index') }}" class="btn-hero-primary" style="background: #ffb800; color: #1e1e2d; box-shadow: 0 4px 18px rgba(255,184,0,.45);">
+                    <i class="fas fa-server me-2"></i>Mua Hosting
+                  </a>
+                  <a href="{{ route('domain.index') }}" class="btn-hero-outline">
+                    <i class="fas fa-globe me-2"></i>Tìm Tên Miền
+                  </a>
+                </div>
+              </div>
+              <div class="col-lg-5 text-center">
+                 <div style="font-size: 8rem; line-height: 1;">🚀</div>
+              </div>
             </div>
-            <div class="hero-divider d-none d-sm-block"></div>
-            <div class="hero-stat">
-              <div class="num">1.200+</div>
-              <div class="label">Khách hàng</div>
-            </div>
-            <div class="hero-divider d-none d-sm-block"></div>
-            <div class="hero-stat">
-              <div class="num">24/7</div>
-              <div class="label">Hỗ trợ</div>
-            </div>
-            <div class="hero-divider d-none d-sm-block"></div>
-            <div class="hero-stat">
-              <div class="num">100%</div>
-              <div class="label">Uy tín</div>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <div class="home-hero mb-0" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);">
+            <div class="row align-items-center g-4">
+              <div class="col-lg-7">
+                <span class="hero-badge" style="background: rgba(0,255,136,.15); color: #00ff88; border-color: rgba(0,255,136,.3);">🤖 Nâng Tầm Hiệu Suất</span>
+                <h1>Tài Khoản AI Premium<br>Trợ Lý Ảo Đắc Lực</h1>
+                <p>Nâng cao năng suất công việc với ChatGPT Plus, Claude, Midjourney và nhiều công cụ AI hàng đầu.</p>
+                <div class="d-flex hero-cta">
+                  <a href="{{ route('ai-account.index') }}" class="btn-hero-primary" style="background: #00ff88; color: #1e1e2d; box-shadow: 0 4px 18px rgba(0,255,136,.4);">
+                    <i class="fas fa-robot me-2"></i>Khám Phá AI
+                  </a>
+                  <a href="{{ route('ai-account.index') }}" class="btn-hero-outline" style="border-color: rgba(255,255,255,.3); color: #fff;">
+                    <i class="fas fa-bolt me-2"></i>Xem Bảng Giá
+                  </a>
+                </div>
+              </div>
+              <div class="col-lg-5 text-center">
+                 <div style="font-size: 8rem; line-height: 1;">🤖</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" style="width: 5%;">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" style="width: 5%;">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
     </div>
 
     {{-- ═══════════════════════ CATEGORY SHORTCUTS ═══════════════════════ --}}
@@ -457,8 +540,70 @@
       </div>
     </div>
 
+    {{-- ═══════════════════════ WEBSITE ═══════════════════════ --}}
+    @if(isset($webs) && $webs->count() > 0)
+    <div class="section-header mt-8">
+      <div>
+        <h2 class="section-title-main">🌐 Tạo Website Giá Rẻ</h2>
+        <div class="section-subtitle">Sở hữu website chuyên nghiệp chỉ với vài cú click chuột</div>
+      </div>
+      <a href="{{ route('web.index') }}" class="view-all-link">Xem tất cả →</a>
+    </div>
+    <div class="mb-8">
+      <div class="row g-3">
+        @foreach ($webs as $item)
+        @php $webSlug = \App\Models\Slug::of('web', $item->id) ?? $item->id; @endphp
+        <div class="col-6 col-md-4 col-xl-3">
+          <div class="product-card">
+            <a href="{{ route('web.view', $webSlug) }}" class="product-img-wrap">
+              <img src="{{ img_url($item->image) }}" alt="{{ $item->name }}">
+            </a>
+            <div class="product-card-body">
+              <a href="{{ route('web.view', $webSlug) }}" class="product-name text-decoration-none">{{ $item->name }}</a>
+              <div class="product-footer mt-auto pt-3">
+                <div class="product-price">{{ number_format($item->price, 0, ',', '.') }}₫ <span style="font-size:0.75rem; color:#a1a5b7; font-weight:normal;">/tháng</span></div>
+                <a href="{{ route('web.view', $webSlug) }}" class="btn-buy-now">Tạo Ngay</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        @endforeach
+      </div>
+    </div>
+    @endif
+
+    {{-- ═══════════════════════ HOSTING ═══════════════════════ --}}
+    @if(isset($hostings) && $hostings->count() > 0)
+    <div class="section-header mt-8">
+      <div>
+        <h2 class="section-title-main">🖥️ Hosting SSD Siêu Tốc</h2>
+        <div class="section-subtitle">Dịch vụ lưu trữ tốc độ cao, ổn định và an toàn</div>
+      </div>
+      <a href="{{ route('hosting.index') }}" class="view-all-link">Xem tất cả →</a>
+    </div>
+    <div class="mb-8">
+      <div class="row g-3">
+        @foreach ($hostings as $item)
+        <div class="col-6 col-md-4 col-xl-3">
+          <div class="product-card" style="border-top: 4px solid #e94560;">
+            <div class="product-card-body text-center pt-4">
+              <div style="font-size: 2.5rem; margin-bottom: 10px;">☁️</div>
+              <h3 class="product-name" style="font-size: 1.1rem; text-transform: uppercase;">{{ $item->package_name }}</h3>
+              <div style="color: #a1a5b7; font-size: 0.85rem; margin-bottom: 15px;">Dung lượng: <strong class="text-gray-900">{{ $item->disk }} GB</strong></div>
+              <div class="product-footer mt-auto pt-3 justify-content-center">
+                <div class="product-price fs-4">{{ number_format($item->price, 0, ',', '.') }}₫ <span style="font-size:0.75rem; color:#a1a5b7; font-weight:normal;">/tháng</span></div>
+              </div>
+              <a href="{{ route('hosting.index') }}" class="btn-buy-now w-100 mt-3 py-2">Đăng Ký</a>
+            </div>
+          </div>
+        </div>
+        @endforeach
+      </div>
+    </div>
+    @endif
+
     {{-- ═══════════════════════ TRUST SECTION ═══════════════════════ --}}
-    <div class="trust-grid mb-8">
+    <div class="trust-grid mb-6">
       <div class="trust-card">
         <div class="trust-icon">🔒</div>
         <h5>Độ An Toàn Cao</h5>

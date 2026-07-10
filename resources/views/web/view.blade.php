@@ -44,89 +44,124 @@
 
 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
     <div class="content flex-row-fluid" id="kt_content">
-        <div class="row">
-            <div class="col-md-6 text-center mb-4 rounded border-danger border border-dashed">
-                <div class="tns mb-2" style="direction: ltr">
-                    <div data-tns="true" data-tns-nav-position="bottom" data-tns-mouse-drag="true" data-tns-controls="false">
-                       @php
-                                $lines = explode("\n", $web->list_images); 
-                       @endphp         
-                                    @foreach ($lines as $line)
-                                        <div class="text-center px-5 pt-5 pt-lg-10 px-lg-10 mb-1">
-                                            <a class="overlay" data-fslightbox="lightbox-hot-sales" href="{{ $line }}">
-                                            <img src="{{ $line }}" class="card-rounded shadow mw-100 mb-5" alt="" loading="lazy" decoding="async" />
-                                        </a>
+        <div class="row g-5">
+            <!-- Left Column: Slider/Images -->
+            <div class="col-lg-7 text-center mb-4">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100" style="background: #f8f9fa;">
+                    <div class="card-body d-flex align-items-center justify-content-center p-0">
+                        <div class="tns w-100" style="direction: ltr">
+                            <div data-tns="true" data-tns-nav-position="bottom" data-tns-mouse-drag="true" data-tns-controls="false">
+                               @php
+                                        $lines = explode("\n", $web->list_images); 
+                               @endphp         
+                                @foreach ($lines as $line)
+                                    @if(trim($line) !== '')
+                                        <div class="text-center">
+                                            <a class="d-block overlay" data-fslightbox="lightbox-hot-sales" href="{{ trim($line) }}">
+                                                <img src="{{ trim($line) }}" class="img-fluid" style="width: 100%; object-fit: cover;" alt="{{ $web->name }}" loading="lazy" decoding="async" />
+                                                <div class="overlay-layer card-rounded bg-dark bg-opacity-25">
+                                                    <i class="bi bi-eye-fill fs-2x text-white"></i>
+                                                </div>
+                                            </a>
                                         </div>
-                                    @endforeach
-                        ...
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-   <div class="card shadow-sm">
-      <div class="card-body">
-          <span class="text-gray-800 fs-1 fw-bold">{{{ $web->name }}}</span>
-         <form id="shopForm" class="mt-4">
-            <div class="mb-3">
-               <label class="form-label">Tài khoản shop:</label>
-               <input type="text" id="tk" class="form-control" placeholder="Tối thiểu 6 ký tự" required>
-            </div>
-            <div class="mb-3">
-               <label class="form-label">Mật khẩu shop:</label>
-               <input type="password" id="mk" class="form-control" placeholder="Nhập mật khẩu Admin" required>
-            </div>
-            <div class="mb-3">
-               <label class="form-label">Tên miền:</label><br>
-               <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="domainOption" id="domainOwn" value="own" checked>
-                  <label class="form-check-label" for="domainOwn">Đã có tên miền</label>
+            <!-- Right Column: Order Form -->
+            <div class="col-lg-5">
+               <div class="card border-0 shadow-sm rounded-4">
+                  <div class="card-body p-6 p-lg-8">
+                     <h2 class="text-gray-900 fs-2 fw-bolder mb-5">{{ $web->name }}</h2>
+                     
+                     <form id="shopForm" class="form">
+                        <div class="mb-5">
+                           <label class="form-label fw-semibold text-gray-700">Tài khoản Admin:</label>
+                           <input type="text" id="tk" class="form-control form-control-solid" placeholder="Tối thiểu 6 ký tự" required>
+                        </div>
+                        <div class="mb-5">
+                           <label class="form-label fw-semibold text-gray-700">Mật khẩu Admin:</label>
+                           <input type="password" id="mk" class="form-control form-control-solid" placeholder="Nhập mật khẩu" required>
+                        </div>
+
+                        <div class="mb-5">
+                           <label class="form-label fw-semibold text-gray-700 d-block mb-3">Tên miền:</label>
+                           <div class="d-flex gap-4">
+                               <div class="form-check form-check-custom form-check-solid">
+                                  <input class="form-check-input" type="radio" name="domainOption" id="domainOwn" value="own" checked>
+                                  <label class="form-check-label fw-medium text-gray-700" for="domainOwn">Đã có tên miền</label>
+                               </div>
+                               <div class="form-check form-check-custom form-check-solid">
+                                  <input class="form-check-input" type="radio" name="domainOption" id="domainBuy" value="buy">
+                                  <label class="form-check-label fw-medium text-gray-700" for="domainBuy">Mua tên miền mới</label>
+                               </div>
+                           </div>
+                        </div>
+
+                        <div id="domainInputArea" class="row g-3 mb-5">
+                           <div class="col-md-12">
+                              <input type="text" id="domainName" class="form-control form-control-solid" placeholder="Nhập tên miền (VD: example.com)">
+                           </div>
+                           <div class="col-md-12" id="domainSelectWrap" style="display:none;">
+                              <select class="form-select form-select-solid" id="domainPrice" data-control="select2" data-hide-search="true">
+                                 <option value="" data-price="0">-- Chọn đuôi tên miền --</option>
+                                 @foreach ($domains as $domain)
+                                 <option value="{{ $domain->name }}" data-price="{{ $domain->price }}">.{{ $domain->name }} (+{{ number_format($domain->price) }}đ)</option>
+                                 @endforeach
+                              </select>
+                           </div>
+                        </div>
+
+                        <div class="mb-5">
+                           <label class="form-label fw-semibold text-gray-700">Thời gian thuê:</label>
+                           <select class="form-select form-select-solid" id="timePrice" data-control="select2" data-hide-search="true">
+                             <option value="" data-month="0" data-web-price="0">-- Chọn số tháng --</option>
+                             @for ($i = 1; $i <= 12; $i++)
+                              <option value="{{ $i }}" data-month="{{ $i }}" data-web-price="{{ $web->price * $i }}">
+                                {{ $i }} tháng (Tạo: {{ number_format( ($web->price * $i) -(($web->price * $i) * $web->ck / 100)) }}đ | Gia hạn: {{ number_format($web->extend * $i) }}đ)
+                              </option>
+                             @endfor
+                           </select>
+                        </div>
+
+                        <div class="alert bg-light-primary border border-primary border-dashed d-flex align-items-center p-5 mb-5 rounded-3">
+                           <i class="bi bi-wallet2 fs-2hx text-primary me-4"></i>
+                           <div class="d-flex flex-column">
+                               <h4 class="mb-1 text-primary">Tổng thanh toán</h4>
+                               <span id="totalPrice" class="fs-1 fw-bolder text-danger">0đ</span>
+                           </div>
+                        </div>
+
+                        <div class="form-check form-check-custom form-check-solid mb-7">
+                           <input class="form-check-input" type="checkbox" id="agree" required>
+                           <label class="form-check-label fw-medium text-gray-600" for="agree">
+                               Tôi đã đọc và đồng ý với <a href="{{ route('terms.condition') }}" class="text-primary fw-bold" target="_blank">điều khoản dịch vụ</a>
+                           </label>
+                        </div>
+
+                        <button type="button" id="btnBuy" class="btn btn-primary w-100 py-3 fs-4 fw-bold">
+                            <i class="fas fa-rocket me-2"></i> Xác nhận & Khởi tạo
+                        </button>
+                     </form>
+                  </div>
                </div>
-               <div class="form-check form-check-inline">
-                  <input class="form-check-input" type="radio" name="domainOption" id="domainBuy" value="buy">
-                  <label class="form-check-label" for="domainBuy">Mua tên miền mới</label>
-               </div>
             </div>
-            <div id="domainInputArea" class="row g-2 mb-3">
-               <div class="col-md-6">
-                  <input type="text" id="domainName" class="form-control"  placeholder="Nhập tên miền (VD: example.com)">
-               </div>
-               <div class="col-md-6" id="domainSelectWrap" style="display:none;">
-                  <select class="form-select" id="domainPrice">
-                     <option value="" data-price="0">Chọn đuôi miền</option>
-                     @foreach ($domains as $domain)
-                     <option value="{{ $domain->name }}" data-price="{{ $domain->price }}">.{{ $domain->name }} (+{{ number_format($domain->price) }}đ)</option>
-                     @endforeach
-                  </select>
-               </div>
-            </div>
-            <div class="mb-3">
-               <label class="form-label">Thời gian:</label>
-               <select class="form-select" id="timePrice">
-                 <option value="" data-month="0" data-web-price="0">Chọn tháng</option>
-                 @for ($i = 1; $i <= 12; $i++)
-                  <option value="{{ $i }}" data-month="{{ $i }}" data-web-price="{{ $web->price * $i }}">
-                    {{ $i }} tháng - Giá tạo ({{ number_format( ($web->price * $i) -(($web->price * $i) * $web->ck / 100)) }}đ) - Gia hạn ({{ number_format($web->extend * $i) }}đ)
-                  </option>
-                 @endfor
-               </select>
-            </div>
-            <div class="mb-3">
-               <strong>Tổng tiền: </strong><span id="totalPrice" class="text-danger fw-bold">0đ</span>
-            </div>
-            <div class="form-check mb-3">
-               <input class="form-check-input" type="checkbox" id="agree" required>
-               <label class="form-check-label" for="agree">Tôi đồng ý với điều khoản</label>
-            </div>
-            <button type="button" id="btnBuy" class="btn btn-success">Xác nhận</button>
-         </form>
-      </div>
-   </div>
-</div>
         </div>
-        <div class="card mt-5">
-            <div class="card-body">
-                <h5 class="fw-bold mb-3">Chi tiết sản phẩm</h5>
-                <p style="white-space: pre-line;">{{ $web->description }}</p>
+
+        <div class="card border-0 shadow-sm rounded-4 mt-6">
+            <div class="card-header border-0 pt-6">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold fs-3 mb-1">Chi tiết sản phẩm</span>
+                    <span class="text-muted mt-1 fw-semibold fs-7">Thông tin giới thiệu về mẫu website này</span>
+                </h3>
+            </div>
+            <div class="card-body py-4">
+                <div class="fs-5 text-gray-700" style="white-space: pre-line; line-height: 1.6;">
+                    {{ $web->description }}
+                </div>
             </div>
         </div>
     </div>

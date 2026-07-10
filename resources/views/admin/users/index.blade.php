@@ -80,6 +80,7 @@
         }
 
         $(document).ready(function() {
+            let currentDraw = 1;
             $("#datatable").DataTable({
                 order: [0, 'desc'],
                 responsive: false,
@@ -100,10 +101,11 @@
                     type: 'GET',
                     dataType: 'json',
                     headers: {
-                        Authorization: `Bearer ${access_token}`,
+                        'Accept': 'application/json',
                         'Accept': 'application/json',
                     },
                     data: function(data) {
+                        currentDraw = data.draw;
                         let payload = {}
 
                         payload.page = data.start / data.length + 1;
@@ -119,6 +121,7 @@
                     dataFilter: function(data) {
                         let json = JSON.parse(data);
                         if (json.status) {
+                            json.draw = currentDraw;
                             json.recordsTotal = json.data.meta.total
                             json.recordsFiltered = json.data.meta.total
                             json.data = json.data.data

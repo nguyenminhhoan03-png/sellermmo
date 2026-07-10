@@ -48,7 +48,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.min.js"></script>
 
-@vite('resources/js/functions.js')
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script>
     const notyf = new Notyf();

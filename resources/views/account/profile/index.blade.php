@@ -38,76 +38,8 @@
             <!--end::Breadcrumb-->
         </div>
         <!--end::Page title-->
-        <!--begin::Actions-->
-        <div class="d-flex align-items-center py-2">
-            <!--begin::Wrapper-->
-            <div class="me-4">
-                <!--begin::Menu-->
-                <a
-                    href="#"
-                    class="btn btn-sm btn-flex btn-light btn-active-primary fw-bold"
-                    data-kt-menu-trigger="click"
-                    data-kt-menu-placement="bottom-end"
-                >
-                    <i class="ki-duotone ki-filter fs-5 text-gray-500 me-1"
-                        ><span class="path1"></span><span class="path2"></span
-                    ></i>
-                    Filter
-                </a>
-
-                <!--begin::Menu 1-->
-                <div
-                    class="menu menu-sub menu-sub-dropdown w-250px w-md-300px"
-                    data-kt-menu="true"
-                    id="kt_menu_67309706460af"
-                >
-                    <div class="px-7 py-5">
-                        <div class="fs-5 text-gray-900 fw-bold">Filter Options</div>
-                        <div class="text-muted fs-7 mt-1">Các bộ lọc mẫu này không còn dùng trực tiếp để giảm DOM/JS nặng.</div>
-                    </div>
-                </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Actions-->
-                        <div class="d-flex justify-content-end">
-                            <button
-                                type="reset"
-                                class="btn btn-sm btn-light btn-active-light-primary me-2"
-                                data-kt-menu-dismiss="true"
-                            >
-                                Reset
-                            </button>
-
-                            <button
-                                type="submit"
-                                class="btn btn-sm btn-primary"
-                                data-kt-menu-dismiss="true"
-                            >
-                                Apply
-                            </button>
-                        </div>
-                        <!--end::Actions-->
-                    </div>
-                    <!--end::Form-->
-                </div>
-                <!--end::Menu 1-->
-                <!--end::Menu-->
-            </div>
-            <!--end::Wrapper-->
-
-            <!--begin::Button-->
-            <a
-                href="#"
-                class="btn btn-sm btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#kt_modal_create_app"
-                id="kt_toolbar_primary_button"
-            >
-                Create
-            </a>
-            <!--end::Button-->
-        </div>
-        <!--end::Actions-->
+    </div>
+    <!--end::Container-->
     </div>
     <!--end::Container-->
 </div>
@@ -219,38 +151,6 @@
                                 <!--end::Info-->
                             </div>
                             <!--end::User-->
-
-                            <!--begin::Actions-->
-                            <div class="d-flex my-4">
-                                <a
-                                    href="#"
-                                    class="btn btn-sm btn-light me-2"
-                                    id="kt_user_follow_button"
-                                >
-                                    <i
-                                        class="ki-duotone ki-check fs-3 d-none"
-                                    ></i>
-                                    <!--begin::Indicator label-->
-                                    <span class="indicator-label"> Follow</span>
-                                    <!--end::Indicator label-->
-
-                                    <!--begin::Indicator progress-->
-                                    <span class="indicator-progress">
-                                        Please wait...
-                                        <span
-                                            class="spinner-border spinner-border-sm align-middle ms-2"
-                                        ></span>
-                                    </span>
-                                    <!--end::Indicator progress-->
-                                </a>
-
-                                
-
-                                <!--begin::Menu-->
-
-                                <!--end::Menu-->
-                            </div>
-                            <!--end::Actions-->
                         </div>
                         <!--end::Title-->
 
