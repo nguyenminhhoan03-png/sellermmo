@@ -52,9 +52,9 @@
                                         </div>
                                         <div class="jsx-d22f6bd0771ae323 qrcode__image p-4 w-200px h-200px">
                                             @if ($recharges->name == 'Thesieure')
-                                            <img class="lazyload" src="{{ asset('assets/media/payments/border-qrcode.svg') }}" data-src="{{ setting('thesieure_qr') ?: asset('assets/media/payments/border-qrcode.svg') }}" width="175" height="175">
+                                            <img src="{{ setting('thesieure_qr') ?: asset('assets/media/payments/border-qrcode.svg') }}" width="175" height="175">
                                             @else
-                                            <img class="lazyload" src="{{ asset('assets/media/payments/border-qrcode.svg') }}" data-src="https://qr.sepay.vn/img?bank={{ $recharges->name }}&acc={{ $recharges->number }}&template=compact&amount=0&des={{ $deposit_prefix }}" width="175" height="175">
+                                            <img src="https://qr.sepay.vn/img?bank={{ $recharges->name }}&acc={{ $recharges->number }}&template=compact&amount=0&des={{ $deposit_prefix }}" width="175" height="175">
                                             @endif                                     
                                         </div>
                                     </div>
