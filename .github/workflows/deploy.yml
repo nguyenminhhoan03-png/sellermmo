@@ -19,10 +19,12 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
+            set -e
             cd /var/www/sellmmo/sellermmo
             git reset --hard
             git pull origin main
-            docker exec sellmmo-app php artisan migrate --force
-            docker exec sellmmo-app php artisan optimize:clear
+            docker exec sellmmo-app php artisan migrate --force || true
+            docker exec sellmmo-app php artisan optimize:clear || true
+            docker restart sellmmo-app
             docker restart sellmmo-queue
             docker restart sellmmo-scheduler
