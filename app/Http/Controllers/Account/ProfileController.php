@@ -66,6 +66,38 @@ class ProfileController extends Controller
     ]);
 }
 
+  public function orders(Request $request)
+  {
+      $user = auth()->user();
+      $tab = $request->query('tab', 'ai');
+
+      $data = [];
+      if ($tab === 'ai') {
+          $data['orders'] = \App\Models\AiAccountOrder::with(['aiAccount.seller', 'variant', 'seller'])
+              ->where('user_id', $user->id)
+              ->orderBy('id', 'desc')
+              ->get();
+      } elseif ($tab === 'code') {
+          $data['orders'] = \App\Models\Hisproduct::with(['product.user'])->where('user_id', $user->id)->orderBy('id', 'desc')->get();
+      } elseif ($tab === 'domain') {
+          $data['orders'] = \App\Models\DomainOrder::where('user_id', $user->id)->orderBy('id', 'desc')->get();
+      } elseif ($tab === 'hosting') {
+          $data['orders'] = \App\Models\PurchasedHosting::where('user_id', $user->id)->orderBy('id', 'desc')->get();
+      } elseif ($tab === 'logo') {
+          $data['orders'] = \App\Models\Hislogo::where('user_id', $user->id)->orderBy('id', 'desc')->get();
+      } elseif ($tab === 'web') {
+          $data['orders'] = \App\Models\Createweb::where('user_id', $user->id)->orderBy('id', 'desc')->get();
+      }
+
+      return view('account.profile.orders', [
+          'pageTitle' => 'Lịch sử mua hàng',
+          'user' => $user,
+          'tab' => $tab,
+          'data' => $data,
+      ]);
+  }
+
+
 
   public function tokenUpdate(Request $request)
   {

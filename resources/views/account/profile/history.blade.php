@@ -359,66 +359,82 @@
                         </div>
                         <!--end::Info-->
                     </div>
-                    <!--end::Details-->
-
-                    <!--begin::Navs-->
-                    <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold">
-                        <!--begin::Nav item-->
-                        <li class="nav-item mt-2">
-                            <a class="nav-link text-active-primary ms-0 me-10 py-5 " href="/account/profile">
+                        <!--begin::Navs-->
+                    <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold mt-5">
+                        <li class="nav-item">
+                            <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/profile">
                                 Thông tin chi tiết
                             </a>
                         </li>
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-active-primary ms-0 me-10 py-5 active" href="/account/history">
-                                Lịch sử hoạt động
+                                Nhật ký hoạt động
                             </a>
                         </li>
-                        <li class="nav-item mt-2">
+                        <li class="nav-item">
                             <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/transactions">
                                 Lịch sử dòng tiền
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/orders">
+                                Lịch sử mua hàng
+                            </a>
+                        </li>
                     </ul>
                     <!--begin::Navs-->
                 </div>
             </div>
             <!--end::Navbar-->
             <!--begin::Row-->
-            <div class="card mb-5 mb-xxl-8">
-                <div class="card-body pt-9 pb-0">
+            <div class="card shadow-sm mb-5 mb-xxl-8" style="border-radius: 16px; border: none;">
+                <div class="card-header border-0 pt-6">
+                    <div class="card-title">
+                        <div class="d-flex align-items-center position-relative my-1">
+                            <i class="ki-duotone ki-time fs-2 text-primary me-2"><span class="path1"></span><span class="path2"></span></i>
+                            <h3 class="fw-bold m-0 fs-3">Nhật ký hoạt động</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body pt-0 pb-5">
                     <div class="table-responsive">
-                        <table id="kt_datatable_zero_configuration" class="table table-row-bordered gy-5">
+                        <table id="kt_datatable_zero_configuration" class="table align-middle table-row-dashed fs-6 gy-5">
                             <thead>
-                                <tr class="fw-semibold fs-6 text-muted">
-                                    <th>STT</th>
-                                    <th>Thời gian</th>
-                                    <th>Hành động</th>
-                                    <th>IP</th>
-                                    <th>description</th>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-50px">STT</th>
+                                    <th class="min-w-150px">Thời gian</th>
+                                    <th class="min-w-150px">Hành động</th>
+                                    <th class="min-w-100px">Địa chỉ IP</th>
+                                    <th class="min-w-200px">Mô tả chi tiết</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody class="text-gray-600 fw-semibold">
                                 @php
                                     $i = 1;
                                 @endphp
                                 @foreach ($log as $logs)
                                     <tr>
-                                        <td>{{ $i++ }}</td>
-                                        <td>{{ $logs->created_at }}</td>
-                                        <td>{{ $logs->action }}</td>
-                                        <td>{{ $logs->ip }}</td>
+                                        <td>
+                                            <span class="badge badge-light-primary fs-7 fw-bold">{{ $i++ }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="symbol symbol-30px me-2">
+                                                    <span class="symbol-label bg-light-info"><i class="ki-duotone ki-calendar-8 fs-5 text-info"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i></span>
+                                                </div>
+                                                {{ \Carbon\Carbon::parse($logs->created_at)->format('d/m/Y H:i:s') }}
+                                            </div>
+                                        </td>
+                                        <td><span class="text-gray-800 fw-bold">{{ $logs->action }}</span></td>
+                                        <td><span class="badge badge-light-dark">{{ $logs->ip }}</span></td>
                                         <td>{{ $logs->description }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="4">Lịch sử hoạt động</th>
-                                </tr>
-                            </tfoot>
                         </table>
+                    </div>
+                </div>
+            </div>e>
                     </div>
                 </div>
             </div>

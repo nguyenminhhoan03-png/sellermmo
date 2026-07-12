@@ -373,6 +373,15 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('seller.chat.inbox') }}" class="menu-item-link {{ Request::routeIs('seller.chat.inbox') || Request::routeIs('seller.chat.conversation') ? 'active' : '' }}">
+                    <div class="menu-item-left">
+                        <i class="fas fa-comments"></i>
+                        <span>Inbox Khách Hàng</span>
+                    </div>
+                </a>
+            </li>
+
+            <li>
                 <a href="{{ route('seller.settings') }}" class="menu-item-link {{ Request::routeIs('seller.settings') ? 'active' : '' }}">
                     <div class="menu-item-left">
                         <i class="fas fa-cog"></i>

@@ -269,6 +269,35 @@
         </a>
         @endauth
 
+        @if($seller)
+        <div style="background: #f8f9fb; border-radius: 14px; padding: 16px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #edf1f5;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{{ route('shop.profile', $seller->username) }}" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
+                @if($seller->avatar)
+                    <img src="{{ $seller->avatar }}" alt="{{ $seller->name }}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+                @else
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#e94560,#c73652); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;">
+                      {{ mb_substr($seller->name, 0, 1) }}
+                    </div>
+                @endif
+                <div>
+                  <div style="font-weight: 800; color: #1e1e2d; font-size: .95rem;">{{ $seller->name }}</div>
+                  <div style="font-size: .8rem; color: #7e8299;">Gian hàng chính hãng</div>
+                </div>
+            </a>
+          </div>
+          @auth
+            <button class="btn btn-sm btn-light-danger fw-bold px-4" onclick="openPanel({{ $seller->id }}, '{{ addslashes($seller->name) }}', '{{ addslashes($seller->username) }}', '{{ addslashes($seller->chat_id ?? '') }}', 'product_ai_{{ $account->id }}')">
+              <i class="bi bi-chat-dots me-1"></i> Liên hệ
+            </button>
+          @else
+            <a href="{{ route('login') }}" class="btn btn-sm btn-light-danger fw-bold px-4">
+              <i class="bi bi-chat-dots me-1"></i> Liên hệ
+            </a>
+          @endauth
+        </div>
+        @endif
+
         <hr class="section-divider">
         <div class="secure-row">
           <span class="secure-item">🔒 Thanh toán an toàn</span>
@@ -404,13 +433,37 @@
         </div>
 
         <div class="mb-3 ai-bank-selection d-none">
-          <label style="font-size:.82rem;font-weight:600;color:#5e6278;margin-bottom:6px;display:block;">Chọn ngân hàng</label>
-          <select class="form-select form-select-solid" data-control="select2" id="ai-bank" name="ai_bank" data-dropdown-parent="#kt_modal_ai_payment">
-            @foreach (\App\Models\BankAccount::where('status',1)->get() as $banks)
-            <option value="{{ $banks->name }}">{{ \App\Models\ApiLogo::GetApiBank($banks->name, 'shortName', 'name') ?: $banks->name }}</option>
+          <label style="font-size:.82rem;font-weight:600;color:#5e6278;margin-bottom:10px;display:block;">Chọn ngân hàng</label>
+          <div class="row g-3">
+            @foreach (\App\Models\BankAccount::where('status',1)->get() as $idx => $banks)
+              @php 
+                $shortName = \App\Models\ApiLogo::GetApiBank($banks->name, 'shortName', 'name') ?: $banks->name;
+                $logoUrl = \App\Models\ApiLogo::GetApiBank($banks->name, 'logo', 'name'); 
+              @endphp
+              <div class="col-6">
+                <input type="radio" class="btn-check ai-bank-radio" name="ai_bank_radio" value="{{ $banks->name }}" id="aiBank_{{ $idx }}" {{ $idx === 0 ? 'checked' : '' }}>
+                <label class="btn btn-outline btn-outline-dashed btn-active-light-success p-3 d-flex align-items-center mb-0 h-100" for="aiBank_{{ $idx }}">
+                  @if($logoUrl)
+                    <img src="{{ $logoUrl }}" style="width:30px;height:auto;object-fit:contain;" class="me-3" alt="{{ $shortName }}">
+                  @else
+                    <i class="ki-duotone ki-bank fs-2x me-3 text-success"><span class="path1"></span><span class="path2"></span></i>
+                  @endif
+                  <span class="fw-bold text-gray-800 fs-7" style="text-align:left;">{{ $shortName }}</span>
+                </label>
+              </div>
             @endforeach
-          </select>
+          </div>
+          <input type="hidden" id="ai-bank" name="ai_bank" value="{{ \App\Models\BankAccount::where('status',1)->first()->name ?? '' }}">
         </div>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.ai-bank-radio').forEach(radio => {
+              radio.addEventListener('change', function() {
+                document.getElementById('ai-bank').value = this.value;
+              });
+            });
+          });
+        </script>
       </div>
       <div class="modal-footer border-0 pt-0 gap-2">
         <button type="button" class="btn btn-light flex-grow-1" data-bs-dismiss="modal">Đóng</button>
@@ -422,6 +475,8 @@
   </div>
 </div>
 @endauth
+
+@include('components.seller-chat-drawer')
 
 @endsection
 @section('scripts')
@@ -499,13 +554,14 @@ document.getElementById('kt_modal_ai_payment')?.addEventListener('show.bs.modal'
   const mn=document.getElementById('modal-variant-name'); if(mn) mn.textContent=selectedVariantName;
   $('#ai-coupon').val(''); aiTotalPayment();
 });
-document.querySelectorAll('input[name="aiPaymentMethod"]').forEach(r=>{ r.addEventListener('change',()=>{ const b=document.querySelector('.ai-bank-selection'); if(r.value==='transfer'){ b?.classList.remove('d-none'); if($.fn.select2) $('#ai-bank').select2({minimumResultsForSearch:Infinity}); } else b?.classList.add('d-none'); }); });
+document.querySelectorAll('input[name="aiPaymentMethod"]').forEach(r=>{ r.addEventListener('change',()=>{ const b=document.querySelector('.ai-bank-selection'); if(r.value==='transfer'){ b?.classList.remove('d-none'); } else b?.classList.add('d-none'); }); });
 function aiTotalPayment() {
   if(!selectedVariantId) return;
   $('#modal-total').html('<i class="fa fa-spinner fa-spin"></i>');
   $.ajax({ url:'/api/vouchers/aivoucher', method:'POST', dataType:'JSON',
-    data:{ access_token:'{{ auth()->user()->access_token ?? "" }}', variant_id:selectedVariantId, code:$('#ai-coupon').val() },
-    success:function(r){ $('#modal-total').html(r.message); }, error:function(){ $('#modal-total').html('Lỗi'); }
+    data:{ _token: '{{ csrf_token() }}', access_token:'{{ auth()->user()->access_token ?? "" }}', variant_id:selectedVariantId, code:$('#ai-coupon').val() },
+    success:function(r){ $('#modal-total').html(r.message); },
+    error:function(xhr){ $('#modal-total').html(xhr.responseJSON?.message || 'Lỗi'); }
   });
 }
 function processAiPayment(){ document.querySelector('input[name="aiPaymentMethod"]:checked')?.value==='balance'?aiPayByBalance():aiPayByTransfer(); }
@@ -514,11 +570,38 @@ function aiPayByBalance(){
   $.ajax({ url:'{{ route("ai-account.payment") }}', method:'POST', dataType:'JSON',
     data:{ _token:'{{ csrf_token() }}', account_id:'{{ $account->id }}', variant_id:selectedVariantId, coupon:$('#ai-coupon').val() },
     success:function(r){
-      if(r.status==200){ Swal.fire({icon:'success',title:'Thành công!',text:r.message,showDenyButton:true,confirmButtonText:'Mua tiếp',denyButtonText:'Lịch sử mua'}).then(res=>{ if(res.isConfirmed) location.reload(); else if(res.isDenied) window.location.href='/ai-account/history'; }); }
+      if(r.status==200){ 
+          $('#kt_modal_ai_payment').modal('hide');
+          showSuccessModal(r.message);
+      }
       else showMessage(r.message,'error');
       $('#btnAiBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false);
     }, error:function(xhr){ showMessage(xhr.responseJSON?.message||'Lỗi','error'); $('#btnAiBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); }
   });
+}
+function showSuccessModal(message) {
+    if (!$('#successPurchaseModal').length) {
+        $('body').append(`
+            <div class="modal fade" id="successPurchaseModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered mw-450px">
+                    <div class="modal-content rounded-4 shadow-sm border-0">
+                        <div class="modal-body text-center p-8">
+                            <div class="mb-4">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                            </div>
+                            <h2 class="fw-bold text-gray-900 mb-3">Thanh Toán Thành Công!</h2>
+                            <p class="text-muted fs-5 mb-6">${message || 'Đơn hàng của bạn đã được xử lý và tài khoản đã sẵn sàng để sử dụng.'}</p>
+                            <div class="d-flex flex-column gap-3">
+                                <a href="/account/orders?tab=ai" class="btn btn-primary fw-bold rounded-pill py-3">Xem lịch sử đơn hàng</a>
+                                <button type="button" class="btn btn-light-primary fw-bold rounded-pill py-3" data-bs-dismiss="modal" onclick="location.reload()">Tiếp tục mua sắm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+    $('#successPurchaseModal').modal('show');
 }
 function aiPayByTransfer(){
   const bank=document.getElementById('ai-bank')?.value;

@@ -259,7 +259,7 @@ $('#btnBuy').on('click', function () {
                     if (res.isConfirmed) {
                         location.reload();
                     } else if (res.isDenied) {
-                        window.location.href = '/web/history';
+                        window.location.href = '/account/orders?tab=web';
                     }
                 });
             } else {

@@ -526,57 +526,81 @@
                 <!--end::Details-->
 
                 <!--begin::Navs-->
-                <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold">
-                    <!--begin::Nav item-->
-                    <li class="nav-item mt-2">
-                        <a class="nav-link text-active-primary ms-0 me-10 py-5 " href="/account/profile">
+                <ul class="nav nav-stretch nav-line-tabs nav-line-tabs-2x border-transparent fs-5 fw-bold mt-5">
+                    <li class="nav-item">
+                        <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/profile">
                             Thông tin chi tiết
                         </a>
                     </li>
-                    <li class="nav-item mt-2">
+                    <li class="nav-item">
                         <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/history">
-                            Lịch sử hoạt động
+                            Nhật ký hoạt động
                         </a>
                     </li>
-                    <li class="nav-item mt-2">
+                    <li class="nav-item">
                         <a class="nav-link text-active-primary ms-0 me-10 py-5 active" href="/account/transactions">
-                           Lịch sử dòng tiền
+                            Lịch sử dòng tiền
                         </a>
                     </li>
-            
+                    <li class="nav-item">
+                        <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/orders">
+                            Lịch sử mua hàng
+                        </a>
+                    </li>
                 </ul>
                 <!--begin::Navs-->
             </div>
         </div>
         <!--end::Navbar-->
         <!--begin::Row-->
-        <div class="card mb-5 mb-xxl-8">
-            <div class="card-body pt-9 pb-0">
+        <div class="card shadow-sm mb-5 mb-xxl-8" style="border-radius: 16px; border: none;">
+            <div class="card-header border-0 pt-6">
+                <div class="card-title">
+                    <div class="d-flex align-items-center position-relative my-1">
+                        <i class="ki-duotone ki-wallet fs-2 text-primary me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                        <h3 class="fw-bold m-0 fs-3">Biến động số dư</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body pt-0 pb-5">
                 <div class="table-responsive">
-                    <table id="kt_datatable_horizontal_scroll" class="table table-striped table-row-bordered gy-5 gs-7">
+                    <table id="kt_datatable_horizontal_scroll" class="table align-middle table-row-dashed fs-6 gy-5 gs-7">
                         <thead>
-                            <tr class="fw-semibold fs-6 text-gray-800">
-                                <th class="min-w-100px">STT</th>
+                            <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                <th class="min-w-50px">STT</th>
                                 <th class="min-w-150px">Số tiền</th>
-                                <th class="min-w-150px">Số tiền trước</th>
-                                <th class="min-w-150px">Số tiền sau</th>
-                                <th class="min-w-150px">Thời gian</th>
-                                <th class="min-w-150px">Thời gian cập nhật</th>
-                                <th class="min-w-250px">description</th>
+                                <th class="min-w-150px">Số dư trước</th>
+                                <th class="min-w-150px">Số dư sau</th>
+                                <th class="min-w-200px">Thời gian</th>
+                                <th class="min-w-300px">Nội dung</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="text-gray-600 fw-semibold">
                             @php 
                             $i = 1;
                             @endphp
                             @foreach ($transaction as $transactions)
                             <tr>
-                                <td>{{ $i++ }}</td>
-                                <td>{{ formatCurrency($transactions->amount) }}</td>
-                                <td>{{ formatCurrency($transactions->balance_before) }}</td>
-                                <td>{{ formatCurrency($transactions->balance_after) }}</td>
-                                <td>{{ $transactions->created_at }}</td>
-                                <td>{{ $transactions->updated_at }}</td>
+                                <td>
+                                    <span class="badge badge-light-primary fs-7 fw-bold">{{ $i++ }}</span>
+                                </td>
+                                <td>
+                                    @if($transactions->amount > 0)
+                                        <span class="text-success fw-bold">+{{ formatCurrency($transactions->amount) }}</span>
+                                    @else
+                                        <span class="text-danger fw-bold">{{ formatCurrency($transactions->amount) }}</span>
+                                    @endif
+                                </td>
+                                <td><span class="text-gray-700">{{ formatCurrency($transactions->balance_before) }}</span></td>
+                                <td><span class="text-gray-900 fw-bold">{{ formatCurrency($transactions->balance_after) }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="symbol symbol-30px me-2">
+                                            <span class="symbol-label bg-light-info"><i class="ki-duotone ki-calendar-8 fs-5 text-info"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i></span>
+                                        </div>
+                                        {{ \Carbon\Carbon::parse($transactions->created_at)->format('d/m/Y H:i:s') }}
+                                    </div>
+                                </td>
                                 <td>{{ $transactions->content }}</td>
                             </tr>
                             @endforeach
@@ -585,7 +609,15 @@
                 </div>
             </div>
         </div>
-        <div class="card mb-5 mb-xxl-8">
+        <div class="card shadow-sm mb-5 mb-xxl-8" style="border-radius: 16px; border: none;">
+            <div class="card-header border-0 pt-6">
+                <div class="card-title">
+                    <div class="d-flex align-items-center position-relative my-1">
+                        <i class="ki-duotone ki-chart-line-up fs-2 text-primary me-2"><span class="path1"></span><span class="path2"></span></i>
+                        <h3 class="fw-bold m-0 fs-3">Biểu đồ tổng quan</h3>
+                    </div>
+                </div>
+            </div>
             <div class="card-body pt-9 pb-0">
                 <div id="totaltransactions" width="1112" class="overflow-hidden"></div>
             </div>

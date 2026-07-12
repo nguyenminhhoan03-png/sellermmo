@@ -56,6 +56,7 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/api/recent-sales', [HomeController::class, 'recentSales'])->name('recent-sales');
 Route::get('/ai-account', [AiAccountController::class, 'index'])->name('ai-account.index');
 
 Route::middleware(['auth'])->group(function () {
@@ -63,6 +64,9 @@ Route::middleware(['auth'])->group(function () {
   Route::post('/ai-account/payment', [AiAccountController::class, 'payment'])->name('ai-account.payment');
   Route::post('/ai-account/transfer-payment', [AiAccountController::class, 'transferPayment'])->name('ai-account.transfer-payment');
 });
+
+// Seller Shop Public Profile
+Route::get('/shop/{username}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.profile');
 
 // Hỗ trợ cả slug (SEO) lẫn id cũ (backward compat)
 Route::get('/ai-account/{slug}', [AiAccountController::class, 'detail'])->name('ai-account.detail');
@@ -81,6 +85,7 @@ Route::middleware(['auth', CheckLastLogin::class])->prefix('/account')->group(fu
   });
   Route::get('/history', [App\Http\Controllers\Account\ProfileController::class, 'Showhistory'])->name('account.profile.history');
   Route::get('/transactions', [App\Http\Controllers\Account\ProfileController::class, 'transactions'])->name('account.transactions');
+  Route::get('/orders', [App\Http\Controllers\Account\ProfileController::class, 'orders'])->name('account.orders');
   Route::get('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorform'])->name('author-form');
   Route::post('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorformPost']);
   Route::get('/ctv', [App\Http\Controllers\Account\ProfileController::class, 'CtvView'])->name('account.ctv');
@@ -119,12 +124,25 @@ Route::middleware(['auth', 'seller', CheckLastLogin::class])->prefix('/seller')-
     Route::post('/withdraw', [App\Http\Controllers\Seller\SellerDashboardController::class, 'withdrawPost'])->name('seller.withdraw.post');
     Route::get('/settings', [App\Http\Controllers\Seller\SellerDashboardController::class, 'settings'])->name('seller.settings');
     Route::post('/settings', [App\Http\Controllers\Seller\SellerDashboardController::class, 'settingsPost'])->name('seller.settings.post');
+
+    // Chat inbox của seller
+    Route::get('/inbox', [App\Http\Controllers\Chat\SellerChatController::class, 'inbox'])->name('seller.chat.inbox');
+    Route::post('/inbox/send', [App\Http\Controllers\Chat\SellerChatController::class, 'reply'])->name('seller.chat.reply');
+    Route::get('/inbox/messages/{conversation_id}', [App\Http\Controllers\Chat\SellerChatController::class, 'getConversation'])->name('seller.chat.conversation');
+
 });
 Route::post('/sepay/webhook', [App\Http\Controllers\Webhook\WebhookController::class, 'sepay'])->name('webhook.sepay');
 
-// Chat client
+// Chat client (User ↔ Admin)
 Route::post('/chat/client-send', [App\Http\Controllers\Chat\ChatController::class, 'sendClientMessage'])->name('client.chat.send');
 Route::get('/chat/client-get-message', [App\Http\Controllers\Chat\ChatController::class, 'getClientMessages'])->name('client.chat.get');
+
+// Chat User ↔ Seller
+Route::middleware(['auth'])->group(function () {
+    Route::post('/chat/seller-send', [App\Http\Controllers\Chat\SellerChatController::class, 'sendToSeller'])->name('seller.chat.user.send');
+    Route::get('/chat/seller-get/{seller_id}', [App\Http\Controllers\Chat\SellerChatController::class, 'getMessages'])->name('seller.chat.user.get');
+});
+
 
 // tạo logo 
 Route::get('logo/', [App\Http\Controllers\Logo\LogoController::class, 'showLogo'])->name('logo.index');

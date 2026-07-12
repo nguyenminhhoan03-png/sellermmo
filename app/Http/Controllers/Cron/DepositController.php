@@ -216,44 +216,57 @@ class DepositController extends Controller
             ], 200);
         }
 
+        // OPTIMIZATION: Extract IDs to perform bulk queries and avoid N+1 issue
+        $userIds = [];
+        $transactionIDs = [];
+        
+        foreach ($list_transaction as $item) {
+            $parsedId = Helper::parseOrderId($item['description'], $prefix);
+            if ($parsedId !== null && $parsedId !== 0) {
+                $userIds[] = $parsedId;
+                $transactionIDs[] = (string) $item['transactionID'];
+            }
+        }
+
+        // Fetch existing transactions and users in single queries
+        $existingTransactions = \App\Models\Transaction::whereIn('order_id', $transactionIDs)->pluck('order_id')->toArray();
+        $users = \App\Models\User::whereIn('id', $userIds)->get()->keyBy('id');
+
         foreach ($list_transaction as $item) {
              
-
             $userId = Helper::parseOrderId($item['description'], $prefix);
 
             if ($userId === null || $userId === 0) {
                 if ($show) {
                     echo 'Không tìm thấy user id trong giao dịch #' . $item['transactionID'] . ' / ' . $item['description'] . '<br />';
                 }
-
                 continue;
             }
 
-            $user = User::find($userId);
+            $transactionID   = (string) $item['transactionID'];
+
+            // Fast local array check instead of DB query
+            if (in_array($transactionID, $existingTransactions)) {
+                if ($show) {
+                    echo 'Giao dịch #' . $transactionID . ' đã tồn tại trong hệ thống [MySQL]<br />';
+                }
+                continue;
+            }
+
+            // Fast local array check instead of DB query
+            $user = $users->get($userId);
 
             if ($user === null) {
                 if ($show) {
                     echo 'Không tìm thấy user #' . $userId . ' trong giao dịch hệ thống [MySQL]<br />';
                 }
-
                 continue;
             }
 
             $code            = 'ATM-' . Helper::randomString(7, true);
             $realAmount      = (float) $item['amount'];
             $description     = $item['description'];
-            $transactionID   = (string) $item['transactionID'];
             $transactionDate = $item['transactionDate'];
-
-            $exists = $this->checkInvoice($transactionID);
-
-            if ($exists !== null) {
-                if ($show) {
-                    echo 'Giao dịch #' . $transactionID . ' đã tồn tại trong hệ thống [MySQL]<br />';
-                }
-
-                continue;
-            }
 
             $amount     = $realAmount;
             $onDiscount = false;

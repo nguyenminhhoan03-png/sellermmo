@@ -440,7 +440,7 @@ function buyProduct() {
                             location.reload();
                         } else if (result.isDenied) {
                             window.location.href =
-                                '/domain/history';
+                                '/account/orders?tab=domain';
                         }
                     });
                 } else {

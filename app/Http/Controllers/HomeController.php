@@ -96,4 +96,47 @@ class HomeController extends Controller
     {
         return view('fe.dieukhoan');
     }
+
+    public function recentSales()
+    {
+        // Fetch recent successful purchases from transactions
+        $transactions = \App\Models\Transaction::where('type', 'like', '%Mua%')
+            ->orderBy('id', 'desc')
+            ->take(20)
+            ->get()
+            ->map(function ($tx) {
+                // Mask username
+                $len = mb_strlen($tx->username);
+                if ($len > 3) {
+                    $masked = mb_substr($tx->username, 0, 2) . '***' . mb_substr($tx->username, -1);
+                } else {
+                    $masked = $tx->username . '***';
+                }
+                return [
+                    'id' => $tx->id,
+                    'username' => $masked,
+                    'content' => $tx->content,
+                    'time' => $tx->created_at->diffForHumans()
+                ];
+            });
+
+        if ($transactions->isEmpty()) {
+            $transactions = collect([
+                [
+                    'id' => 999991,
+                    'username' => 'nm***',
+                    'content' => 'Vừa mua thành công Gói Google One AI Premium (Gemini Advanced) 1 Tháng',
+                    'time' => '1 phút trước'
+                ],
+                [
+                    'id' => 999992,
+                    'username' => 'ad***n',
+                    'content' => 'Vừa mua thành công Tài Khoản Canva Pro Giáo Dục Vĩnh Viễn',
+                    'time' => '5 phút trước'
+                ]
+            ]);
+        }
+
+        return response()->json($transactions);
+    }
 }

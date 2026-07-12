@@ -700,7 +700,7 @@ function handleChatPress(e) {
                         showMessage(response.message, 'success');
                         setTimeout(() => {
                             window.location.replace(
-                            '/hosting/history');
+                            '/account/orders?tab=hosting');
                         }, 1000);
                     } else {
                         Swal.close();

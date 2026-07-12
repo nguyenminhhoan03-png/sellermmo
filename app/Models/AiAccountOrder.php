@@ -14,6 +14,7 @@ class AiAccountOrder extends Model
     protected $fillable = [
         'user_id',
         'ai_account_id',
+        'seller_id',
         'variant_id',
         'trans_id',
         'price',
@@ -35,5 +36,14 @@ class AiAccountOrder extends Model
     public function variant()
     {
         return $this->belongsTo(AiAccountVariant::class, 'variant_id');
+    }
+
+    /**
+     * Người bán (snapshot tại thời điểm mua).
+     * null = admin quản lý.
+     */
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 }

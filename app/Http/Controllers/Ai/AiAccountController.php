@@ -112,9 +112,12 @@ class AiAccountController extends Controller
         $trans_id = Helper::random('QWERTYUIOPASDFGHJKZXCVBNM', 2) . time();
         $expiry_date = $variant->duration_days ? now()->addDays((int) $variant->duration_days) : null;
 
+        $account = AiAccount::find($payload['account_id']);
+
         $order = AiAccountOrder::create([
             'user_id'       => $user->id,
             'ai_account_id' => $payload['account_id'],
+            'seller_id'     => $account?->seller_id,  // Snapshot seller tại thời điểm mua
             'variant_id'    => $variant->id,
             'trans_id'      => $trans_id,
             'price'         => $price,
@@ -264,6 +267,7 @@ class AiAccountController extends Controller
                 'a.account_info',
                 'a.status',
                 'a.created_at',
+                'a.seller_id',
                 'c.name as category_name',
                 'c.slug as category_slug'
             )
@@ -324,13 +328,18 @@ class AiAccountController extends Controller
         // Keep AI comments separate from code comments in the shared comments table.
         $commentPostId = 1000000 + (int) $account->id;
 
-        return view('fe.ai-detail', compact('account', 'variants', 'commentPostId', 'relatedAccounts', 'aiCategories'));
+        $seller = null;
+        if ($account->seller_id) {
+            $seller = DB::table('users')->select('id', 'name', 'username', 'chat_id', 'avatar')->where('id', $account->seller_id)->first();
+        }
+
+        return view('fe.ai-detail', compact('account', 'variants', 'commentPostId', 'relatedAccounts', 'aiCategories', 'seller'));
     }
 
     public function history()
     {
         $user = auth()->user();
-        $orders = AiAccountOrder::with(['aiAccount', 'variant'])
+        $orders = AiAccountOrder::with(['aiAccount.seller', 'variant', 'seller'])
             ->where('user_id', $user->id)
             ->orderBy('id', 'desc')
             ->get();

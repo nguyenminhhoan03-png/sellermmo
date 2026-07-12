@@ -281,6 +281,21 @@
             <option value="0" @selected(old('status', $account->status ?? 1) == 0)>❌ Ẩn</option>
           </select>
         </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">👤 Người bán</label>
+          <select name="seller_id" class="form-select">
+            <option value="">— Admin quản lý —</option>
+            @foreach($sellers as $seller)
+              <option value="{{ $seller->id }}"
+                @selected(old('seller_id', $account->seller_id ?? '') == $seller->id)>
+                {{ $seller->name }} (@{{ $seller->username }})
+              </option>
+            @endforeach
+          </select>
+          <div class="form-text text-muted">
+            Chọn người bán sở hữu sản phẩm AI này. Sau khi mua, khách hàng sẽ thấy thông tin liên hệ của người bán.
+          </div>
+        </div>
         @if($isEdit)
         <div class="text-muted small">
           <i class="bx bx-time"></i> Tạo lúc: {{ $account->created_at->format('d/m/Y H:i') }}<br>
@@ -288,6 +303,7 @@
         </div>
         @endif
       </div>
+
 
       <div class="d-grid gap-2">
         <button type="submit" class="btn btn-primary btn-lg">

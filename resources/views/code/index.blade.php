@@ -475,7 +475,7 @@ function buyProduct(){
   $('#btnBuy').html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...').prop('disabled',true);
   $.ajax({ url:"/view/payment", method:"POST", dataType:"JSON",
     data:{ _token:'{{ csrf_token() }}', id:"{{ $code->id }}", code:$("#coupon").val(), variant_id: $('#selected_variant_id').val() || '' },
-    success:function(r){ if(r.status=='200'){ Swal.fire({icon:'success',title:'Thành công!',text:r.message,showDenyButton:true,confirmButtonText:'Mua thêm',denyButtonText:'Xem đơn hàng'}).then(res=>{ if(res.isConfirmed) location.reload(); else if(res.isDenied) window.location.href='/code/history'; }); } else showMessage(r.message,'error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); },
+    success:function(r){ if(r.status=='200'){ Swal.fire({icon:'success',title:'Thành công!',text:r.message,showDenyButton:true,confirmButtonText:'Mua thêm',denyButtonText:'Xem đơn hàng'}).then(res=>{ if(res.isConfirmed) location.reload(); else if(res.isDenied) window.location.href='/account/orders?tab=code'; }); } else showMessage(r.message,'error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); },
     error:function(xhr){ showMessage(xhr.responseJSON?.message||'Lỗi','error'); $('#btnBuy').html('<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán').prop('disabled',false); }
   });
 }

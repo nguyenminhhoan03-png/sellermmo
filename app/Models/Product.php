@@ -28,18 +28,16 @@ class Product extends Model
     ];
 
     public const CATEGORIES = [
-        'website'   => ['label' => 'Website',    'icon' => '🌐'],
-        'game'      => ['label' => 'Game',        'icon' => '🎮'],
-        'phanmem'   => ['label' => 'Phần mềm',   'icon' => '💻'],
-        'ecommerce' => ['label' => 'E-commerce',  'icon' => '🛒'],
-        'blog'      => ['label' => 'Blog/News',   'icon' => '📰'],
-        'account'   => ['label' => 'Tài khoản',   'icon' => '🔑'],
-        'mail'      => ['label' => 'Email (Gmail...)', 'icon' => '📧'],
-        'via_bm'    => ['label' => 'Via & BM FB', 'icon' => '📘'],
-        'clone'     => ['label' => 'Clone / MXH', 'icon' => '👥'],
-        'vps'       => ['label' => 'VPS / Hosting', 'icon' => '🖥️'],
-        'tool'      => ['label' => 'Tool / Bot', 'icon' => '🛠️'],
-        'other'     => ['label' => 'Khác',        'icon' => '📦'],
+        'source_code' => ['label' => 'Mã Nguồn', 'icon' => '💻'],
+        'ai_account'  => ['label' => 'Tài Khoản AI', 'icon' => '🤖'],
+        'domain'      => ['label' => 'Tên Miền', 'icon' => '🌐'],
+        'cronjob'     => ['label' => 'CronJobs', 'icon' => '⏱️'],
+        'hosting'     => ['label' => 'Shared Hosting', 'icon' => '☁️'],
+        'logo'        => ['label' => 'Tạo Logo', 'icon' => '🎨'],
+        'website'     => ['label' => 'Tạo Website', 'icon' => '🕸️'],
+        'account'     => ['label' => 'Tài khoản MMO', 'icon' => '🔑'],
+        'tool'        => ['label' => 'Tool / Phần mềm', 'icon' => '🛠️'],
+        'other'       => ['label' => 'Khác', 'icon' => '📦'],
     ];
 
     public static function getCode($id, $row)

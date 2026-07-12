@@ -167,7 +167,7 @@
                         if (res.isConfirmed) {
                             location.reload();
                         } else if (res.isDenied) {
-                            window.location.href = '/logo/history';
+                            window.location.href = '/account/orders?tab=logo';
                         }
                     });
                 } else {

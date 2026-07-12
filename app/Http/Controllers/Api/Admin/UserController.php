@@ -53,7 +53,7 @@ class UserController extends Controller
              'banned' => $item->banned,
              'loai' => $item->loai,
              'time_request' => $item->time_request,
-             'created_at'=> $item->created_at->format('Y-m-d H:i:s'),
+             'created_at'=> $item->created_at?->format('Y-m-d H:i:s'),
          ];
      });  
 

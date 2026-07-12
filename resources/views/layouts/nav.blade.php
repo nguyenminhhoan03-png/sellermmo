@@ -166,8 +166,8 @@
                                     <!--end:Menu item--><!--begin:Menu item-->
                                     <div class="menu-item">
                                         <!--begin:Menu link--><a
-                                            class="menu-link @if (request()->routeIs('code.history')) active @endif"
-                                            href="/code/history"><span class="menu-bullet"><span
+                                            class="menu-link @if (request()->query('tab') == 'code' || request()->routeIs('code.history')) active @endif"
+                                            href="/account/orders?tab=code"><span class="menu-bullet"><span
                                                     class="bullet bullet-dot"></span></span><span
                                                 class="menu-title">Lịch sử mua</span></a><!--end:Menu link-->
                                     </div>
@@ -178,12 +178,8 @@
                             <!--end:Menu item--><!--begin:Menu item-->
                             <div data-kt-menu-trigger="click"
                                 class="menu-item menu-accordion @if (request()->routeIs('ai-account.*')) here show @endif">
-                                <!--begin:Menu link--><span class="menu-link"><span class="menu-icon"><i
-                                             class="ki-duotone ki-robot fs-2">
-                                             <span class="path1"></span>
-                                             <span class="path2"></span>
-                                             <span class="path3"></span>
-                                         </i>
+                                <!--begin:Menu link--><span class="menu-link"><span class="menu-icon">
+                                        <i class="fas fa-robot fs-2"></i>
                                      </span>
                                      <span class="menu-title">Tài Khoản AI</span>
                                      <span class="menu-arrow"></span></span><!--end:Menu link--><!--begin:Menu sub-->
@@ -199,8 +195,8 @@
                                      <!--end:Menu item--><!--begin:Menu item-->
                                      <div class="menu-item">
                                          <!--begin:Menu link--><a
-                                             class="menu-link @if (request()->routeIs('ai-account.history')) active @endif"
-                                             href="/ai-account/history"><span class="menu-bullet"><span
+                                             class="menu-link @if (request()->query('tab') == 'ai' || request()->routeIs('ai-account.history')) active @endif"
+                                             href="/account/orders?tab=ai"><span class="menu-bullet"><span
                                                      class="bullet bullet-dot"></span></span><span
                                                  class="menu-title">Lịch sử mua</span></a><!--end:Menu link-->
                                      </div>
@@ -230,8 +226,8 @@
                                     <!--end:Menu item--><!--begin:Menu item-->
                                     <div class="menu-item">
                                         <!--begin:Menu link--><a
-                                            class="menu-link @if (request()->routeIs('domain.history')) active @endif"
-                                            href="/domain/history"><span class="menu-bullet"><span
+                                            class="menu-link @if (request('tab') == 'domain') active @endif"
+                                            href="/account/orders?tab=domain"><span class="menu-bullet"><span
                                                     class="bullet bullet-dot"></span></span><span
                                                 class="menu-title">Quản lý miền</span></a><!--end:Menu link-->
                                     </div>
@@ -754,9 +750,56 @@
                                 <!--end::Menu-->
                             </div>
                             <!--end::Theme mode-->
+                            <!--end::Theme mode-->
+
+                            @auth
+                                <!--begin::Notifications-->
+                                <div class="d-flex align-items-center ms-1 ms-lg-3">
+                                    <div class="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-30px h-30px w-md-40px h-md-40px position-relative" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                                        <i class="bi bi-bell-fill fs-3"></i>
+                                        <span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink"></span>
+                                    </div>
+                                    <div class="menu menu-sub menu-sub-dropdown menu-column w-350px w-lg-375px" data-kt-menu="true">
+                                        <div class="d-flex flex-column bgi-no-repeat rounded-top" style="background: linear-gradient(135deg, #e94560, #c73652);">
+                                            <h3 class="text-white fw-semibold px-9 mt-8 mb-6">Thông báo
+                                                <span class="fs-8 opacity-75 ps-3">Giao dịch gần đây</span>
+                                            </h3>
+                                        </div>
+                                        <div class="scroll-y mh-325px my-5 px-8">
+                                            @php
+                                                $recentNotifs = \App\Models\Transaction::where('user_id', auth()->id())->orderBy('id', 'desc')->take(8)->get();
+                                            @endphp
+                                            @forelse($recentNotifs as $notif)
+                                            <div class="d-flex align-items-start py-4">
+                                                <div class="symbol symbol-35px me-4 mt-1">
+                                                    <span class="symbol-label bg-light-{{ $notif->amount > 0 ? 'success' : 'danger' }}">
+                                                        <i class="bi bi-{{ $notif->amount > 0 ? 'arrow-down-left text-success' : 'arrow-up-right text-danger' }} fs-4"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1 pe-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        @php
+                                                            $typeMap = ['new-order' => 'Đơn hàng mới', 'deposit' => 'Nạp tiền', 'refund' => 'Hoàn tiền'];
+                                                            $displayType = $typeMap[$notif->type] ?? $notif->type;
+                                                            if (str_contains(strtolower($notif->type), 'mua')) $displayType = 'Mua hàng';
+                                                        @endphp
+                                                        <a href="#" class="fs-6 text-gray-800 text-hover-primary fw-bold">{{ $displayType }}</a>
+                                                        <span class="text-muted fs-8">{{ $notif->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                    <div class="text-gray-600 fs-7" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
+                                                        {{ $notif->content }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @empty
+                                            <div class="text-center text-muted py-10">Bạn chưa có giao dịch nào.</div>
+                                            @endforelse
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Notifications-->
 
                             <!--begin::User menu-->
-                            @auth
                                 <div class="d-flex align-items-center ms-1 ms-lg-3">
                                     <!--begin::Menu wrapper-->
                                     <div class="btn btn-color-gray-800 btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px position-relative"
@@ -851,11 +894,20 @@
                                             </div>
                                             <!--end::Menu sub-->
                                         </div>
+                                        
+                                        <div class="menu-item px-5">
+                                            <a href="/portal/recharge" class="menu-link px-5">
+                                                <span class="menu-icon"><i class="fas fa-wallet fs-4 text-success me-2"></i></span>
+                                                <span class="menu-title fw-bold text-success">Nạp Tiền</span>
+                                            </a>
+                                        </div>
+
                                         <div class="separator my-2"></div>
                                         @if (auth()->user()->level == 1)
                                             <div class="menu-item px-5">
-                                                <a href="/Cpanel" class="menu-link px-5">
-                                                    Quản Trị Viên
+                                                <a href="/Cpanel" class="menu-link px-5 fw-bold">
+                                                    <span class="menu-icon"><i class="fas fa-user-shield fs-4 text-danger me-2"></i></span>
+                                                    <span class="menu-title text-danger">Quản Trị Viên</span>
                                                 </a>
                                             </div>
                                             <div class="menu-item px-5">
@@ -871,88 +923,49 @@
                                             </div>
                                         @else
                                             <div class="menu-item px-5">
-                                                <a href="/account/author-form" class="menu-link px-5">
-                                                    Trở thành người bán hàng
+                                                <a href="/account/author-form" class="menu-link px-5 fw-bold">
+                                                    <span class="menu-icon"><i class="fas fa-store fs-4 text-warning me-2"></i></span>
+                                                    <span class="menu-title">Trở thành người bán hàng</span>
                                                 </a>
                                             </div>
                                         @endif
                                         <div class="menu-item px-5">
-                                            <a href="https://t.me/{{ config('app.name_bot') }}?start={{ auth()->user()->access_token }}" class="menu-link px-5">
-                                                Liên kết Telegram
+                                            <a href="https://t.me/{{ config('app.name_bot') }}?start={{ auth()->user()->access_token }}" class="menu-link px-5 fw-bold">
+                                                <span class="menu-icon"><i class="fab fa-telegram fs-4 text-info me-2"></i></span>
+                                                <span class="menu-title">Liên kết Telegram</span>
                                             </a>
                                         </div>
                                         <div class="separator my-2"></div>
                                         <!--end::Menu separator-->
 
                                         <!--begin::Menu item-->
-                                        <div class="menu-item px-5">
-                                            <a href="/account/profile" class="menu-link px-5">
-                                                Thông tin tài khoản
-                                            </a>
-                                        </div>
-                                        
-                                        <!--begin::Menu item-->
                                         <div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
-                                            data-kt-menu-placement="right-start" data-kt-menu-offset="-15px, 0">
-                                            <a href="#" class="menu-link px-5">
-                                                <span class="menu-title">Lịch sử</span>
+                                            data-kt-menu-placement="left-start" data-kt-menu-offset="-15px, 0">
+                                            <a href="#" class="menu-link px-5 fw-bold">
+                                                <span class="menu-icon"><i class="ki-duotone ki-user fs-3 me-1"><span class="path1"></span><span class="path2"></span></i></span>
+                                                <span class="menu-title">Quản lý tài khoản</span>
                                                 <span class="menu-arrow"></span>
                                             </a>
 
                                             <!--begin::Menu sub-->
-                                            <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                                            <div class="menu-sub menu-sub-dropdown w-200px py-4">
                                                 <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <a href="/code/history" class="menu-link px-5">
-                                                        Mã nguồn
+                                                    <a href="{{ route('account.profile.index') }}" class="menu-link px-5 fw-bold">
+                                                        <i class="ki-duotone ki-profile-circle fs-4 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                                        Hồ sơ cá nhân
                                                     </a>
                                                 </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <a href="/ai-account/history" class="menu-link px-5">
-                                                        Tài khoản AI
+                                                    <a href="/account/history" class="menu-link px-5 fw-bold">
+                                                        <i class="ki-duotone ki-time fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                                        Nhật ký hoạt động
                                                     </a>
                                                 </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <a href="/domain/history" class="menu-link px-5">
-                                                        Tên Miền
-                                                    </a>
-                                                </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
-                                                <div class="menu-item px-3">
-                                                    <a href="/hosting/history" class="menu-link px-5">
-                                                        Hosting
-                                                    </a>
-                                                </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
-                                                <div class="menu-item px-3">
-                                                    <a href="/web/history" class="menu-link px-5">
-                                                        Tạo Website
-                                                    </a>
-                                                </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
-                                                <div class="menu-item px-3">
-                                                    <a href="/logo/history" class="menu-link px-5">
-                                                        Tạo Logo
-                                                    </a>
-                                                </div>
-                                                <!--end::Menu item-->
-
-                                                <!--begin::Menu item-->
-                                                <div class="menu-item px-3">
-                                                    <a href="/cronjob/history" class="menu-link px-5">
-                                                        CronJobs
+                                                    <a href="/account/transactions" class="menu-link px-5 fw-bold">
+                                                        <i class="ki-duotone ki-wallet fs-4 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                        Lịch sử dòng tiền
                                                     </a>
                                                 </div>
                                                 <!--end::Menu item-->
@@ -963,22 +976,18 @@
 
                                                 <!--begin::Menu item-->
                                                 <div class="menu-item px-3">
-                                                    <div class="menu-content px-3">
-                                                        <label
-                                                            class="form-check form-switch form-check-custom form-check-solid">
-                                                            <input class="form-check-input w-30px h-20px" type="checkbox"
-                                                                value="1" checked="checked" name="notifications" />
-                                                            <span class="form-check-label text-muted fs-7">
-                                                                Thông Báo
-                                                            </span>
-                                                        </label>
-                                                    </div>
+                                                    <a href="/account/orders" class="menu-link px-5">
+                                                        <i class="ki-duotone ki-handcart fs-4 me-2"><span class="path1"></span><span class="path2"></span></i>
+                                                        Tất cả lịch sử mua
+                                                    </a>
                                                 </div>
                                                 <!--end::Menu item-->
+
                                             </div>
                                             <!--end::Menu sub-->
                                         </div>
                                         <!--end::Menu item-->
+
 
                                         <!--begin::Menu separator-->
                                         <div class="separator my-2"></div>
@@ -989,8 +998,9 @@
 
                                         <!--begin::Menu item-->
                                         <div class="menu-item px-5">
-                                            <a href="/logout" class="menu-link px-5">
-                                                Đăng xuất
+                                            <a href="/logout" class="menu-link px-5 fw-bold">
+                                                <span class="menu-icon"><i class="fas fa-sign-out-alt fs-4 text-danger me-2"></i></span>
+                                                <span class="menu-title text-danger">Đăng xuất</span>
                                             </a>
                                         </div>
                                         <!--end::Menu item-->

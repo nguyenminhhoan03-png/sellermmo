@@ -27,11 +27,20 @@ class AiAccount extends Model
     }
 
     protected $fillable = [
-        'name', 'image', 'description', 'account_info', 'status', 'category_id',
+        'name', 'image', 'description', 'account_info', 'status', 'category_id', 'seller_id',
     ];
 
     public function variant()
     {
         return $this->hasMany(AiAccountVariant::class, 'account_id', 'id');
+    }
+
+    /**
+     * Người bán tạo ra sản phẩm AI này.
+     * null = do Admin quản lý trực tiếp.
+     */
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
     }
 }

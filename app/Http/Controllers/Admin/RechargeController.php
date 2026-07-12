@@ -183,7 +183,7 @@ class RechargeController extends Controller
           foreach ($chartCategories as $chartCategory) {
             $chartDeposit[]   = Transaction::where('extras->loai', 'card')->whereDate('created_at', $chartCategory)->sum('amount');
           }
-        return view('admin.recharge.card', $apis, compact('rechargecard', 'stats', 'chartCategories', 'chartDeposit'));
+        return view('admin.recharge.card', array_merge($apis, compact('rechargecard', 'stats', 'chartCategories', 'chartDeposit')));
     }
     public function updateCard(Request $request)
   {
@@ -227,7 +227,7 @@ class RechargeController extends Controller
     $url = env('LINK_API_NAP', 'https://thueapi.pro');
         $modifiedUrl = str_replace('https://', '', $url);
         $modifiedUrl = strtoupper($modifiedUrl);
-    return view('admin.recharge.apibank', $apis, compact('modifiedUrl'));
+    return view('admin.recharge.apibank', array_merge($apis, compact('modifiedUrl')));
     }
     public function updateApi(Request $request)
   {

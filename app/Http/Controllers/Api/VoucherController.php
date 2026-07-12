@@ -177,7 +177,6 @@ class VoucherController extends Controller
         $payload = $request->validate([
             'variant_id'   => 'required|integer',
             'code'         => 'nullable|string',
-            'access_token' => 'required|exists:users,access_token',
         ]);
 
         $variant = \Illuminate\Support\Facades\DB::table('ai_accounts_variant')->where('id', $payload['variant_id'])->first();

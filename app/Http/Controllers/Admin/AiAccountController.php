@@ -8,6 +8,7 @@ use App\Models\AiAccount;
 use App\Models\AiAccountCategory;
 use App\Models\AiAccountOrder;
 use App\Models\AiAccountVariant;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -28,16 +29,18 @@ class AiAccountController extends Controller
     public function create()
     {
         $categories = DB::table('ai_account_categories')->where('is_active', 1)->orderBy('id')->get();
+        $sellers    = User::where('level', 2)->orderBy('username')->get(['id', 'username', 'name']);
 
-        return view('admin.ai.form', compact('categories'));
+        return view('admin.ai.form', compact('categories', 'sellers'));
     }
 
     public function edit(int $id)
     {
         $account    = AiAccount::with('variant')->findOrFail($id);
         $categories = DB::table('ai_account_categories')->where('is_active', 1)->orderBy('id')->get();
+        $sellers    = User::where('level', 2)->orderBy('username')->get(['id', 'username', 'name']);
 
-        return view('admin.ai.form', compact('account', 'categories'));
+        return view('admin.ai.form', compact('account', 'categories', 'sellers'));
     }
 
     public function store(Request $request)
@@ -47,6 +50,7 @@ class AiAccountController extends Controller
             'description' => 'nullable|string',
             'account_info'=> 'nullable|string|max:500',
             'category_id' => 'nullable|integer',
+            'seller_id'   => 'nullable|integer|exists:users,id',
             'status'      => 'required|integer',
             'image'       => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:4096',
         ]);
@@ -89,6 +93,7 @@ class AiAccountController extends Controller
             'description' => 'nullable|string',
             'account_info'=> 'nullable|string|max:500',
             'category_id' => 'nullable|integer',
+            'seller_id'   => 'nullable|integer|exists:users,id',
             'status'      => 'required|integer',
             'image'       => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:4096',
         ]);
