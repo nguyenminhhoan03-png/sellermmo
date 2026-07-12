@@ -526,7 +526,14 @@
                                                             {{ $order->aiAccount->name ?? 'Tài khoản đã bị xóa' }}
                                                         </a>
                                                         <span class="text-gray-500 fw-semibold d-block fs-7">
-                                                            Người bán: <span class="badge badge-light-success">{{ $order->seller->username ?? 'Admin' }}</span>
+                                                            Người bán: 
+                                                            @if(isset($order->seller))
+                                                                <a href="{{ route('shop.profile', $order->seller->username) }}" class="badge badge-light-success text-hover-primary">
+                                                                    {{ $order->seller->username }}
+                                                                </a>
+                                                            @else
+                                                                <span class="badge badge-light-success">Admin</span>
+                                                            @endif
                                                         </span>
                                                     </div>
                                                 </div>
@@ -535,10 +542,10 @@
                                                 <span class="badge badge-light-info fs-7">{{ $order->variant->name ?? 'N/A' }}</span>
                                             </td>
                                             <td>
-                                                <span class="badge badge-light-dark fs-7">{{ $order->quantity }}</span>
+                                                <span class="badge badge-light-dark fs-7">1</span>
                                             </td>
                                             <td>
-                                                <span class="text-success fw-bold">{{ number_format($order->total_price) }}đ</span>
+                                                <span class="text-success fw-bold">{{ number_format($order->price ?? 0) }}đ</span>
                                             </td>
                                             <td>
                                                 @if(isset($order->aiAccount))
