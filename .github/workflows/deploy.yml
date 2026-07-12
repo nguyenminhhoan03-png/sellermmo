@@ -21,8 +21,8 @@ jobs:
           script: |
             set -e
             cd /var/www/sellmmo/sellermmo
-            git reset --hard
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             docker exec sellmmo-app php artisan migrate --force || true
             docker exec sellmmo-app php artisan optimize:clear || true
             docker restart sellmmo-app
