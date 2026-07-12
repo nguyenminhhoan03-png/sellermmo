@@ -22,8 +22,7 @@ jobs:
             cd /var/www/sellmmo/sellermmo
             git reset --hard
             git pull origin main
-            docker compose build
-            docker compose up -d
             docker exec sellmmo-app php artisan migrate --force
             docker exec sellmmo-app php artisan optimize:clear
-            docker restart sellmmo-nginx
+            docker restart sellmmo-queue
+            docker restart sellmmo-scheduler
