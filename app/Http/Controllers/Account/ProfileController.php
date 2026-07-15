@@ -97,7 +97,70 @@ class ProfileController extends Controller
       ]);
   }
 
+  public function chat(Request $request)
+  {
+      $user = auth()->user();
+      
+      $conversations = \App\Models\ChatConversation::with('seller')
+          ->where('user_id', $user->id)
+          ->orderBy('last_message_at', 'desc')
+          ->get();
 
+      $totalUnread = $conversations->sum('unread_user');
+
+      $sellerId = $request->query('seller_id');
+      $activeId = (int) $request->query('room', $conversations->first()?->id ?? 0);
+      
+      if ($sellerId) {
+          $seller = \App\Models\User::find($sellerId);
+          if ($seller) {
+              $conv = $conversations->where('seller_id', $sellerId)->first();
+              if ($conv) {
+                  $activeId = $conv->id;
+              } else {
+                  $newConv = new \App\Models\ChatConversation([
+                      'id' => 0,
+                      'user_id' => $user->id,
+                      'seller_id' => $seller->id,
+                      'unread_user' => 0
+                  ]);
+                  $newConv->setRelation('seller', $seller);
+                  $conversations->prepend($newConv);
+                  $activeId = 0;
+              }
+          }
+      }
+
+      $activeConversation = $conversations->firstWhere('id', $activeId) ?? ($conversations->firstWhere('seller_id', $sellerId) ?? $conversations->first());
+      $messages = collect();
+
+      if ($activeConversation && $activeConversation->id > 0) {
+          if ($activeConversation->unread_user > 0) {
+              $unreadBefore = (int) $activeConversation->unread_user;
+              $activeConversation->update(['unread_user' => 0]);
+              $activeConversation->unread_user = 0;
+              $totalUnread = max(0, $totalUnread - $unreadBefore);
+
+              \App\Models\ChatMessage::where('conversation_id', $activeConversation->id)
+                  ->where('sender_type', 'seller')
+                  ->where('is_read', 0)
+                  ->update(['is_read' => 1]);
+          }
+
+          $messages = \App\Models\ChatMessage::where('conversation_id', $activeConversation->id)
+              ->orderBy('created_at', 'asc')
+              ->get();
+      }
+
+      return view('account.profile.chat', [
+          'pageTitle' => 'Tin nhắn hỗ trợ',
+          'user' => $user,
+          'conversations' => $conversations,
+          'activeConversation' => $activeConversation,
+          'messages' => $messages,
+          'totalUnread' => $totalUnread,
+      ]);
+  }
 
   public function tokenUpdate(Request $request)
   {

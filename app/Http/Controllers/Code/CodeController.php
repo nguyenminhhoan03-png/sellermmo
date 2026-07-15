@@ -42,6 +42,9 @@ use App\Events\GlobalPurchaseEvent;
 
          $code->increment('view');
          $user = User::where('id', $code->user_id)->first();
+         if (!$user) {
+             $user = User::where('loai', 'admin')->first();
+         }
          return view('code.index', [
              'pageTitle' => 'Mã nguồn ' . $code->name,
              'code'      => $code,
@@ -77,6 +80,13 @@ use App\Events\GlobalPurchaseEvent;
           ], 401);
       }      
         $code = $payload['code'];
+
+        if ($product->user_id == $user->id) {
+            return response()->json([
+                'status'  => 400,
+                'message' => 'Bạn không thể tự mua sản phẩm của chính mình.',
+            ], 400);
+        }
 
         $voucher = Voucher::where('code', $code)->where('type', 'code')->first();
 

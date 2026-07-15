@@ -547,6 +547,11 @@
                             Lịch sử mua hàng
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/chat">
+                            Tin nhắn
+                        </a>
+                    </li>
                 </ul>
                 <!--begin::Navs-->
             </div>

@@ -381,6 +381,11 @@
                                 Lịch sử mua hàng
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-active-primary ms-0 me-10 py-5" href="/account/chat">
+                                Tin nhắn
+                            </a>
+                        </li>
                     </ul>
                     <!--begin::Navs-->
                 </div>
@@ -528,11 +533,18 @@
                                                         <span class="text-gray-500 fw-semibold d-block fs-7">
                                                             Người bán: 
                                                             @if(isset($order->seller))
-                                                                <a href="{{ route('shop.profile', $order->seller->username) }}" class="badge badge-light-success text-hover-primary">
-                                                                    {{ $order->seller->username }}
+                                                                <a href="{{ route('account.chat', ['seller_id' => $order->seller->id]) }}" class="badge badge-light-success text-hover-primary" title="Chat với người bán">
+                                                                    <i class="ki-duotone ki-messages fs-8 text-success me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> {{ $order->seller->username }}
                                                                 </a>
                                                             @else
-                                                                <span class="badge badge-light-success">Admin</span>
+                                                                @php
+                                                                    $admin = \App\Models\User::where('level', 2)->first();
+                                                                    $adminUsername = $admin->username ?? 'admin';
+                                                                    $adminId = $admin->id ?? 1;
+                                                                @endphp
+                                                                <a href="{{ route('account.chat', ['seller_id' => $adminId]) }}" class="badge badge-light-success text-hover-primary" title="Chat với admin">
+                                                                    <i class="ki-duotone ki-messages fs-8 text-success me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> {{ $adminUsername }}
+                                                                </a>
                                                             @endif
                                                         </span>
                                                     </div>
@@ -548,11 +560,13 @@
                                                 <span class="text-success fw-bold">{{ number_format($order->price ?? 0) }}đ</span>
                                             </td>
                                             <td>
+                                                @php
+                                                    $sellerUsername = isset($order->seller) ? $order->seller->username : (\App\Models\User::where('level', 2)->first()->username ?? 'admin');
+                                                @endphp
                                                 @if(isset($order->aiAccount))
-                                                    <button type="button" class="btn btn-sm btn-light-primary btn-view-info" 
-                                                        data-info="{{ htmlspecialchars($order->aiAccount->account_info) }}">
+                                                    <a href="{{ route('shop.profile', $sellerUsername) }}" target="_blank" class="btn btn-sm btn-light-primary">
                                                         Xem thông tin
-                                                    </button>
+                                                    </a>
                                                 @else
                                                     <span class="text-muted">Không có thông tin</span>
                                                 @endif
@@ -563,7 +577,10 @@
                                             <td>
                                                 <a href="/ai-account/{{ $order->aiAccount->slug ?? $order->ai_account_id }}" class="btn btn-sm btn-icon btn-light-primary">
                                                     <i class="ki-duotone ki-eye fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                                   @elseif($tab == 'code')
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @elseif($tab == 'code')
                                         @php
                                             $seller = $order->product ? $order->product->user : null;
                                         @endphp
@@ -575,7 +592,21 @@
                                                         {{ $order->product->name ?? 'Mã nguồn đã bị xóa' }}
                                                     </a>
                                                     <span class="text-gray-500 fw-semibold d-block fs-7">
-                                                        Người bán: <span class="badge badge-light-success">{{ $seller->username ?? 'Admin' }}</span>
+                                                        Người bán: 
+                                                        @if(isset($seller))
+                                                            <a href="{{ route('account.chat', ['seller_id' => $seller->id]) }}" class="badge badge-light-success text-hover-primary" title="Chat với người bán">
+                                                                <i class="ki-duotone ki-messages fs-8 text-success me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> {{ $seller->username }}
+                                                            </a>
+                                                        @else
+                                                            @php
+                                                                $admin = \App\Models\User::where('level', 2)->first();
+                                                                $adminUsername = $admin->username ?? 'admin';
+                                                                $adminId = $admin->id ?? 1;
+                                                            @endphp
+                                                            <a href="{{ route('account.chat', ['seller_id' => $adminId]) }}" class="badge badge-light-success text-hover-primary" title="Chat với admin">
+                                                                <i class="ki-duotone ki-messages fs-8 text-success me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i> {{ $adminUsername }}
+                                                            </a>
+                                                        @endif
                                                     </span>
                                                 </div>
                                             </td>
@@ -771,6 +802,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- Include Seller Chat Drawer -->
+
 @endsection
 @section('scripts')
     <script>
@@ -780,7 +814,7 @@
             }
         });
         
-        $('.btn-view-info').on('click', function() {
+        $(document).on('click', '.btn-view-info', function() {
             var info = $(this).data('info');
             $('#accountInfoContent').html(info);
             $('#accountInfoModal').modal('show');

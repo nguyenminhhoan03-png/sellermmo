@@ -228,6 +228,55 @@
           <span class="ai-badge-item ai-badge-dur"   id="display-duration">⏱ Thời hạn: –</span>
         </div>
 
+        @if($seller)
+        @php
+          $deposit = $seller->total_deposit ?? 0;
+          $depositText = $deposit >= 1000000 ? round($deposit / 1000000, 1) . 'M' : ($deposit >= 1000 ? round($deposit / 1000) . 'k' : number_format($deposit) . 'đ');
+
+          $timeReq = $seller->time_request ?? 0;
+          $diffMins = now()->timestamp - $timeReq;
+          $onlineText = 'Online gần đây';
+          if ($timeReq > 0) {
+              if ($diffMins < 300) {
+                  $onlineText = 'Vừa online';
+              } else {
+                  $onlineText = 'Online ' . \Carbon\Carbon::createFromTimestamp($timeReq)->locale('vi')->diffForHumans(null, true) . ' trước';
+              }
+          }
+        @endphp
+        <div style="font-size: .85rem; color: #5e6278; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #edf1f5;">
+          <div style="margin-bottom: 6px;">
+            <span style="color: #f1c40f; font-size: .95rem;">★★★★★</span> (0 đánh giá)
+            <span style="margin: 0 6px; color: #d8d8e5;">|</span> Đã bán: <strong style="color: #1e1e2d;">{{ number_format($account->sold ?? 0) }}</strong>
+            <span style="margin: 0 6px; color: #d8d8e5;">|</span> Khiếu nại: <strong style="color: #27ae60;">0.0%</strong>
+          </div>
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+            Người bán: 
+            <a href="{{ route('shop.profile', $seller->username) }}" style="color: #17a589; font-weight: 700; text-decoration: none;">
+              {{ $seller->name }}
+            </a>
+            <span style="background: #f1c40f; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: .7rem; font-weight: 700; margin-left: 2px;">L.V {{ \App\Models\User::getUser($seller->id, 'level') ?? 1 }}</span>
+            <span style="margin: 0 4px; color: #d8d8e5;">|</span>
+            <span style="color: #a1a5b7;">{{ $onlineText }}</span>
+            <span style="margin: 0 4px; color: #d8d8e5;">|</span>
+            <span style="background: #8e44ad; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: .7rem;">Đã xác thực</span>
+            <span style="margin: 0 4px; color: #d8d8e5;">|</span>
+            <span style="background: #e8f9f4; color: #17a589; padding: 1px 6px; border-radius: 4px; font-size: .7rem; font-weight: 600;">Bảo hiểm: {{ $depositText }}</span>
+          </div>
+          <div style="margin-top: 10px;">
+            @auth
+            <a href="javascript:void(0)" onclick="openPanel({{ $seller->id }}, '{{ addslashes($seller->name) }}', '{{ addslashes($seller->username) }}', '{{ addslashes($seller->chat_id ?? '') }}', 'product_ai_{{ $account->id }}')" class="btn btn-sm btn-light-danger fw-bold px-3 py-1" style="font-size: .8rem; border-radius: 8px;">
+              <i class="bi bi-chat-dots me-1"></i> Liên hệ người bán
+            </a>
+            @else
+            <a href="{{ route('login') }}" class="btn btn-sm btn-light-danger fw-bold px-3 py-1" style="font-size: .8rem; border-radius: 8px;">
+              <i class="bi bi-chat-dots me-1"></i> Đăng nhập để liên hệ
+            </a>
+            @endauth
+          </div>
+        </div>
+        @endif
+
         <hr class="section-divider">
 
         <div class="variant-title">Chọn gói khả dụng</div>
@@ -269,34 +318,7 @@
         </a>
         @endauth
 
-        @if($seller)
-        <div style="background: #f8f9fb; border-radius: 14px; padding: 16px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #edf1f5;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="{{ route('shop.profile', $seller->username) }}" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
-                @if($seller->avatar)
-                    <img src="{{ $seller->avatar }}" alt="{{ $seller->name }}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
-                @else
-                    <div style="width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#e94560,#c73652); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700;">
-                      {{ mb_substr($seller->name, 0, 1) }}
-                    </div>
-                @endif
-                <div>
-                  <div style="font-weight: 800; color: #1e1e2d; font-size: .95rem;">{{ $seller->name }}</div>
-                  <div style="font-size: .8rem; color: #7e8299;">Gian hàng chính hãng</div>
-                </div>
-            </a>
-          </div>
-          @auth
-            <button class="btn btn-sm btn-light-danger fw-bold px-4" onclick="openPanel({{ $seller->id }}, '{{ addslashes($seller->name) }}', '{{ addslashes($seller->username) }}', '{{ addslashes($seller->chat_id ?? '') }}', 'product_ai_{{ $account->id }}')">
-              <i class="bi bi-chat-dots me-1"></i> Liên hệ
-            </button>
-          @else
-            <a href="{{ route('login') }}" class="btn btn-sm btn-light-danger fw-bold px-4">
-              <i class="bi bi-chat-dots me-1"></i> Liên hệ
-            </a>
-          @endauth
-        </div>
-        @endif
+
 
         <hr class="section-divider">
         <div class="secure-row">

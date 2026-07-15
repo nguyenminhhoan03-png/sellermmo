@@ -86,6 +86,7 @@ Route::middleware(['auth', CheckLastLogin::class])->prefix('/account')->group(fu
   Route::get('/history', [App\Http\Controllers\Account\ProfileController::class, 'Showhistory'])->name('account.profile.history');
   Route::get('/transactions', [App\Http\Controllers\Account\ProfileController::class, 'transactions'])->name('account.transactions');
   Route::get('/orders', [App\Http\Controllers\Account\ProfileController::class, 'orders'])->name('account.orders');
+  Route::get('/chat', [App\Http\Controllers\Account\ProfileController::class, 'chat'])->name('account.chat');
   Route::get('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorform'])->name('author-form');
   Route::post('/author-form', [App\Http\Controllers\Account\ProfileController::class, 'authorformPost']);
   Route::get('/ctv', [App\Http\Controllers\Account\ProfileController::class, 'CtvView'])->name('account.ctv');

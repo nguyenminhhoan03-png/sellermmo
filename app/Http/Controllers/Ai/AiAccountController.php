@@ -114,6 +114,10 @@ class AiAccountController extends Controller
 
         $account = AiAccount::find($payload['account_id']);
 
+        if ($account && $account->seller_id == $user->id) {
+            return response()->json(['status' => 400, 'message' => 'Bạn không thể tự mua tài khoản AI của chính mình.'], 400);
+        }
+
         $order = AiAccountOrder::create([
             'user_id'       => $user->id,
             'ai_account_id' => $payload['account_id'],
@@ -205,6 +209,11 @@ class AiAccountController extends Controller
             if ($voucher && now()->lessThanOrEqualTo($voucher->expire_date)) {
                 $price = $price - ($price * $voucher->value / 100);
             }
+        }
+
+        $account = AiAccount::find($payload['account_id']);
+        if ($account && $account->seller_id == $user->id) {
+            return response()->json(['status' => 400, 'message' => 'Bạn không thể tự mua tài khoản AI của chính mình.'], 400);
         }
 
         if ($price == 0) {
@@ -330,7 +339,12 @@ class AiAccountController extends Controller
 
         $seller = null;
         if ($account->seller_id) {
-            $seller = DB::table('users')->select('id', 'name', 'username', 'chat_id', 'avatar')->where('id', $account->seller_id)->first();
+            $seller = DB::table('users')->select('id', 'name', 'username', 'chat_id', 'time_request', 'total_deposit', 'created_at')->where('id', $account->seller_id)->first();
+        }
+        
+        // If no seller is assigned (e.g. system product), default to admin
+        if (!$seller) {
+            $seller = DB::table('users')->select('id', 'name', 'username', 'chat_id', 'time_request', 'total_deposit', 'created_at')->where('id', 1)->first();
         }
 
         return view('fe.ai-detail', compact('account', 'variants', 'commentPostId', 'relatedAccounts', 'aiCategories', 'seller'));

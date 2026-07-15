@@ -237,9 +237,9 @@
             </div>
         </div>
         <div class="shop-actions">
-            <button class="btn-chat-now" data-bs-toggle="offcanvas" data-bs-target="#sellerChatDrawer" onclick="openPanel({{ $seller->id }}, '{{ $seller->username }}', '{{ $seller->username }}', '', '')">
+            <a href="{{ route('account.chat', ['seller_id' => $seller->id]) }}" class="btn-chat-now" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
                 <i class="bi bi-chat-dots-fill"></i> Chat ngay
-            </button>
+            </a>
             <button class="btn-favorite">
                 <i class="bi bi-heart"></i> Yêu thích
             </button>
@@ -321,6 +321,6 @@
 </div>
 
 <!-- Include Seller Chat Drawer -->
-@include('components.seller-chat-drawer')
+
 
 @endsection

@@ -34,4 +34,12 @@ class ChatConversation extends Model
     {
         return $this->hasMany(ChatMessage::class, 'conversation_id', 'id');
     }
+
+    /**
+     * Mối quan hệ: Một đoạn chat thuộc về một Người bán (Seller)
+     */
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id', 'id');
+    }
 }

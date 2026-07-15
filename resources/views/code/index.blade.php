@@ -233,12 +233,30 @@
         <div class="code-id-badge">✅ Mã: #{{ $code->id }}</div>
         <h1 class="code-name">{{ $code->name }}</h1>
 
-        <div class="seller-row">
-          <img src="{{ asset('assets/media/avatars/user-placeholder.svg') }}" class="seller-avatar" alt="">
-          <div class="seller-info">
-            <div class="seller-level">{{ getuser($user->level) }}</div>
-            <a href="/resller/{{ $user->id }}" class="seller-name">{{ $user->name }}</a>
+        <div class="seller-row" style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            @if(isset($user->avatar) && $user->avatar)
+                <img src="{{ $user->avatar }}" class="seller-avatar" alt="{{ $user->name }}">
+            @else
+                <div class="seller-avatar" style="background: linear-gradient(135deg,#e94560,#c73652); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                  {{ mb_substr($user->name, 0, 1) }}
+                </div>
+            @endif
+            <div class="seller-info">
+              <div class="seller-level">{{ getuser($user->level) }}</div>
+              <a href="/resller/{{ $user->id }}" class="seller-name">{{ $user->name }}</a>
+            </div>
           </div>
+          
+          @auth
+            <button class="btn btn-sm btn-light-danger fw-bold px-4" onclick="openPanel({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->username) }}', '{{ addslashes($user->chat_id ?? '') }}', 'product_code_{{ $code->id }}')">
+              <i class="bi bi-chat-dots me-1"></i> Liên hệ
+            </button>
+          @else
+            <a href="{{ route('login') }}" class="btn btn-sm btn-light-danger fw-bold px-4">
+              <i class="bi bi-chat-dots me-1"></i> Liên hệ
+            </a>
+          @endauth
         </div>
 
         <hr class="code-divider">
@@ -406,6 +424,8 @@
   </div>
 </div>
 @endif {{-- end @if($realPriceCheck > 0) --}}
+
+@include('components.seller-chat-drawer')
 
 @endsection
 @section('scripts')

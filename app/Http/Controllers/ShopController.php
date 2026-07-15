@@ -16,12 +16,28 @@ class ShopController extends Controller
         $seller = User::where('username', $username)->firstOrFail();
 
         // Get Products (Digital Goods/Source code)
-        $productsQuery = Product::where('user_id', $seller->id)->where('status', 1)->orderBy('id', 'desc');
+        $productsQuery = Product::where('status', 1)->orderBy('id', 'desc');
+        if ($seller->level == 2) {
+            $productsQuery->where(function($q) use ($seller) {
+                $q->where('user_id', $seller->id)->orWhereNull('user_id')->orWhere('user_id', 0);
+            });
+        } else {
+            $productsQuery->where('user_id', $seller->id);
+        }
+        
         $totalProducts = $productsQuery->count();
         $products = $productsQuery->paginate(12, ['*'], 'products_page');
 
         // Get Ai Accounts
-        $aiQuery = AiAccount::where('seller_id', $seller->id)->where('status', 1)->withMin('variant', 'price')->withMax('variant', 'price')->orderBy('id', 'desc');
+        $aiQuery = AiAccount::where('status', 1)->withMin('variant', 'price')->withMax('variant', 'price')->orderBy('id', 'desc');
+        if ($seller->level == 2) {
+            $aiQuery->where(function($q) use ($seller) {
+                $q->where('seller_id', $seller->id)->orWhereNull('seller_id')->orWhere('seller_id', 0);
+            });
+        } else {
+            $aiQuery->where('seller_id', $seller->id);
+        }
+        
         $totalAi = $aiQuery->count();
         $aiAccounts = $aiQuery->paginate(12, ['*'], 'ai_page');
 
@@ -29,7 +45,8 @@ class ShopController extends Controller
         $joinDays = Carbon::parse($seller->created_at)->diffInDays(Carbon::now());
         if ($joinDays == 0) $joinDays = 1;
 
-        $totalSoldProducts = Product::where('user_id', $seller->id)->sum('sold') ?? 0;
+        $soldQuery = clone $productsQuery;
+        $totalSoldProducts = $soldQuery->sum('sold') ?? 0;
         $totalSold = $totalSoldProducts; // Total sold count
         
         // Trust score mock (since we don't have a real trust system yet)

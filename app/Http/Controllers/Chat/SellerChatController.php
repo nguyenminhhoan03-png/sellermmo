@@ -72,7 +72,7 @@ class SellerChatController extends Controller
         }
 
         return response()->json([
-            'status'  => 'success',
+            'status'  => 200,
             'time'    => $message->created_at->format('H:i'),
         ]);
     }
